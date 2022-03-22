@@ -29,7 +29,7 @@ rm -rf \
 
 # Copy Configs
 COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
-COPY configs/dnsdist/conf.d/unblockDock.conf /etc/dnsdist/conf.d/unblockDock.conf
+COPY configs/dnsdist/conf.d/SniDust.conf /etc/dnsdist/conf.d/SniDust.conf
 COPY configs/sniproxy/sniproxy.conf /etc/sniproxy.conf
 COPY domains.lst /tmp/domains.lst
 
