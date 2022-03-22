@@ -1,3 +1,5 @@
+[![Docker](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml)
+
 # SniDust
 SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
 
