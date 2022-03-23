@@ -1,8 +1,8 @@
 #!/bin/bash -e
-
-if [ ! -z ${EXTERNAL_IP+x} ];
+if [ -z ${EXTERNAL_IP} ];
 then
-  export EXTERNAL_IP=$(/sbin/ip route|awk '/default/ { print $3 }')
+  echo "External IP not set - trying to get IP by myself"
+  export EXTERNAL_IP=$(curl icanhazip.com)
 fi
 
 IFS=', ' read -ra array <<< "$ALLOWED_CLIENTS"
