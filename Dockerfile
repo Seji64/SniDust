@@ -1,5 +1,5 @@
 FROM debian:11-slim
-MAINTAINER Seji64 <seji@tihoda.de>
+LABEl org.opencontainers.image.authors="seji@tihoda.de"
 
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV DNSDIST_BIND_IP=0.0.0.0
@@ -20,8 +20,8 @@ COPY dnsdist_preference /etc/apt/preferences.d/dnsdist
 
 RUN curl -sL https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - && \
 apt-get update && apt-get -y install dnsdist && \
-apt-get dist-upgrade && \
-apt-get clean && \
+apt-get dist-upgrade -y && \
+apt-get clean -y && \
 rm -rf \
 /tmp/* \
 /var/lib/apt/lists/* \
