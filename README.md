@@ -10,6 +10,7 @@ SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
 - Netflix
 - Hulu
 - Amazon Prime
+- SRF.ch (live tv)
 - ...and many more (see [domains.lst](domains.lst))
 
 # Example Usage
