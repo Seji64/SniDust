@@ -1,19 +1,26 @@
 FROM debian:11-slim
-LABEl org.opencontainers.image.authors="seji@tihoda.de"
+LABEL org.opencontainers.image.authors="seji@tihoda.de"
 
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV DNSDIST_BIND_IP=0.0.0.0
 ENV ALLOWED_CLIENTS=127.0.0.1
 ENV EXTERNAL_IP=
+ENV DNSDIST_WEBSERVER_PASSWORD=
+ENV DNSDIST_WEBSERVER_API_KEY=
+ENV DNSDIST_WEBSERVER_NETWORKS_ACL="127.0.0.1, ::1"
+
+# HEALTHCHECKS
+HEALTHCHECK --interval=30s --timeout=3s CMD pgrep "dnsdist" > /dev/null || exit 1
 
 # Expose Ports
 EXPOSE 5300/udp
 EXPOSE 80/tcp
 EXPOSE 443/tcp
+EXPOSE 8083/tcp
 
 # Update Base and install sniproxy and dnsdist
 RUN apt-get update && \
-apt-get -y install sniproxy sed curl gnupg tini
+apt-get -y install sniproxy sed curl gnupg tini procps
 
 COPY pdns.list /etc/apt/sources.list.d/pdns.list
 COPY dnsdist_preference /etc/apt/preferences.d/dnsdist
