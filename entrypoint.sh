@@ -31,7 +31,7 @@ sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/
 chown -R dnsdist:dnsdist -R /etc/dnsdist
 
 echo "Starting DNSDist..."
-/usr/bin/dnsdist --supervised --disable-syslog --uid dnsdist --gid dnsdist &
+/usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
 echo "Starting sniproxy"
 /usr/sbin/sniproxy -c /etc/sniproxy.conf -f &
 
