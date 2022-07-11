@@ -1,7 +1,6 @@
-FROM debian:11-slim
+FROM alpine:3.16
 LABEL org.opencontainers.image.authors="seji@tihoda.de"
 
-ENV DEBIAN_FRONTEND="noninteractive"
 ENV DNSDIST_BIND_IP=0.0.0.0
 ENV ALLOWED_CLIENTS=127.0.0.1
 ENV EXTERNAL_IP=
@@ -19,20 +18,11 @@ EXPOSE 443/tcp
 EXPOSE 8083/tcp
 
 # Update Base and install sniproxy and dnsdist
-RUN apt-get update && \
-apt-get -y install sniproxy sed curl gnupg tini procps
-
-COPY pdns.list /etc/apt/sources.list.d/pdns.list
-COPY dnsdist_preference /etc/apt/preferences.d/dnsdist
-
-RUN curl -sL https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - && \
-apt-get update && apt-get -y install dnsdist && \
-apt-get dist-upgrade -y && \
-apt-get clean -y && \
-rm -rf \
-/tmp/* \
-/var/lib/apt/lists/* \
-/var/tmp/*
+RUN apk update && apk upgrade  && \
+apk add --no-cache sniproxy dnsdist sed curl gnupg tini procps bash && \
+mkdir -p /etc/dnsdist/conf.d &&  \
+rm -rf /var/cache/apk/* && \
+rm -rf /var/tmp/*
 
 # Copy Configs
 COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
@@ -43,4 +33,4 @@ COPY domains.lst /tmp/domains.lst
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]

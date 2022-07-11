@@ -2,7 +2,7 @@
 if [ -z ${EXTERNAL_IP} ];
 then
   echo "External IP not set - trying to get IP by myself"
-  export EXTERNAL_IP=$(curl icanhazip.com)
+  export EXTERNAL_IP=$(curl -f icanhazip.com)
 fi
 
 if [ -z ${DNSDIST_WEBSERVER_PASSWORD} ];
@@ -28,10 +28,10 @@ sed -i "s/EXTERNAL_IP/$EXTERNAL_IP/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_PASSWORD/$DNSDIST_WEBSERVER_PASSWORD/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_API_KEY/$DNSDIST_WEBSERVER_API_KEY/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/dnsdist/dnsdist.conf && \
-chown -R root:_dnsdist -R /etc/dnsdist
+chown -R dnsdist:dnsdist -R /etc/dnsdist
 
 echo "Starting DNSDist..."
-/usr/bin/dnsdist --supervised --disable-syslog --uid _dnsdist --gid _dnsdist &
+/usr/bin/dnsdist --supervised --disable-syslog --uid dnsdist --gid dnsdist &
 echo "Starting sniproxy"
 /usr/sbin/sniproxy -c /etc/sniproxy.conf -f &
 
