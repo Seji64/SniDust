@@ -17,12 +17,11 @@ EXPOSE 80/tcp
 EXPOSE 443/tcp
 EXPOSE 8083/tcp
 
-# Update Base and install sniproxy and dnsdist
-RUN apk update && apk upgrade  && \
-apk add --no-cache sniproxy dnsdist sed curl gnupg tini procps bash && \
-mkdir -p /etc/dnsdist/conf.d &&  \
-rm -rf /var/cache/apk/* && \
-rm -rf /var/tmp/*
+# Update Base and install/setup sniproxy and dnsdist
+RUN apk update && apk upgrade && \
+apk add --no-cache sniproxy dnsdist sed curl gnupg tini procps bash ca-certificates & \
+rm -rfv /var/cache/apk/* & \
+mkdir -vp /etc/dnsdist/conf.d
 
 # Copy Configs
 COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
