@@ -21,6 +21,8 @@ docker run -d -e ALLOWED_CLIENTS="127.0.0.1, PUBLIC_ISP_IP" -e EXTERNAL_IP=PUBLI
 
 Point your DNS Settings to PUBLIC_VPS_IP and watch your favorite show
 
+**Note**: *PUBLIC_ISP_IP* and *PUBLIC_VPS_IP* just **PLACEHOLDERS** - You have to replace it with your IP-Addresses!
+
 # Credits
 Based on the following projects:
 
