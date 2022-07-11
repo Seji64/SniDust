@@ -37,4 +37,5 @@ echo "Starting sniproxy"
 
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
 
+
 wait -n
