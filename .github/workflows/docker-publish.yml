@@ -44,8 +44,6 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-        with:
-          platforms: 'arm64,arm'
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -84,7 +82,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/arm64
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
