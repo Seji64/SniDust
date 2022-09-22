@@ -7,6 +7,7 @@ ENV EXTERNAL_IP=
 ENV DNSDIST_WEBSERVER_PASSWORD=
 ENV DNSDIST_WEBSERVER_API_KEY=
 ENV DNSDIST_WEBSERVER_NETWORKS_ACL="127.0.0.1, ::1"
+ENV DNSDIST_UPSTREAM_CHECK_INTERVAL=10
 
 # HEALTHCHECKS
 HEALTHCHECK --interval=30s --timeout=3s CMD pgrep "dnsdist" > /dev/null || exit 1
@@ -21,7 +22,7 @@ EXPOSE 8083/tcp
 RUN apk update && apk upgrade
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist sniproxy curl bash sed gnupg procps ca-certificates && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist sniproxy curl bash sed gnupg procps ca-certificates openssl && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d
