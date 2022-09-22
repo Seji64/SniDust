@@ -28,6 +28,7 @@ sed -i "s/EXTERNAL_IP/$EXTERNAL_IP/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_PASSWORD/$DNSDIST_WEBSERVER_PASSWORD/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_API_KEY/$DNSDIST_WEBSERVER_API_KEY/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/dnsdist/dnsdist.conf && \
+sed -i "s/DNSDIST_UPSTREAM_CHECK_INTERVAL/$DNSDIST_UPSTREAM_CHECK_INTERVAL/" /etc/dnsdist/dnsdist.conf && \
 chown -R dnsdist:dnsdist -R /etc/dnsdist
 
 echo "Starting DNSDist..."
