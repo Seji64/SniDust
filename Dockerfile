@@ -22,7 +22,7 @@ EXPOSE 8083/tcp
 RUN apk update && apk upgrade
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist sniproxy curl bash sed gnupg procps ca-certificates openssl && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist sniproxy curl bash sed gnupg procps ca-certificates openssl dog && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d
