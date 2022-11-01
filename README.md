@@ -3,7 +3,7 @@
 # SniDust
 SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
 
-# Supported Services
+## Supported Services
 
 - Zattoo
 - Wilmaa
@@ -12,13 +12,13 @@ SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
 - Amazon Prime
 - SRF.ch (live tv)
 
-# Prerequisites
+## Prerequisites
 
 You will need a VPS or a Root Server where you can install [Docker](https://www.docker.com/) (or Docker is already installed).
 
-#  Usage
+##  Usage
 
-## Get your Public IP (Client)
+### Get your Public IP (Client)
 
 ```
 ## run this in your terminal or use your webbrowser
@@ -26,14 +26,14 @@ curl https://ifconfig.me
 ```
 For this **example** i we assume your public ip (of your *client*) is `10.111.123.7`
 
-## Get your IP of your Server
+### Get your IP of your Server
 
 ```
 curl https://ifconfig.me
 ```
 For this **example** i we assume your public ip (of your *server*) is `10.111.123.8`
 
-## Run SniDust on your Server
+### Run SniDust on your Server
 
 ```
 docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" -e EXTERNAL_IP=10.111.123.8 -p 443:443 -p 80:80 -p 53:5300/udp ghcr.io/seji64/snidust:main
@@ -56,7 +56,7 @@ services:
         image: 'ghcr.io/seji64/snidust:main'
 ```
 
-## Check logs of the container
+### Check logs of the container
 ```
 docke logs snidust
 ```
@@ -73,15 +73,15 @@ Marking downstream 1.1.1.1:443 as 'up'
 Polled security status of version 1.7.1 at startup, no known issues reported: OK
 ```
 
-## Configure your client
+### Configure your client
 
 Change your network settings and set as DNS Server 10.111.123.8 (PUBLIC_VPS_IP)
 
 Your GeoLaction should now hidden :-)
 
-# Troubleshooting
+## Troubleshooting
 
-## Error Port 53 is already in use
+### Error Port 53 is already in use
 
 In this case you either run another service (like Pi-Hole) which already uses this Port or you likely use an linux distribution which uses systemd.
 
@@ -89,12 +89,12 @@ In case systemd is already using port 53 you can follow this [Guide](https://www
 
 ## Advanced
 
-## Add custom domains
+### Add custom domains
 
 In case you want to add custom domains which not included by default, this can be done easily.
 Create a file with the name `99-custom.lst`. Insert all your custom domains in this file.
 
-### Mount it
+#### Mount it
 
 ```
 docker run --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" -e EXTERNAL_IP=10.111.123.8 -p 443:443 -p 80:80 -p 53:5300/udp -v ~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro ghcr.io/seji64/snidust:main
@@ -137,7 +137,7 @@ You should see in the logs (`docker logs snidust`) snidust has reloaded your dom
 [SniDust] Domain Lists reloaded!
 ```
 
-# Credits
+## Credits
 Based on the following projects:
 
 - https://github.com/andykimpe/wilmaa-proxy
