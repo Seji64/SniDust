@@ -22,16 +22,25 @@ EXPOSE 8083/tcp
 RUN apk update && apk upgrade
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist sniproxy curl bash sed gnupg procps ca-certificates openssl dog lua5.3-filesystem && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist curl bash sed gnupg procps ca-certificates openssl dog lua5.3-filesystem && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d && \
     mkdir -p /etc/snidust/
 
+# Download and install sniproxy
+RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
+    "linux/amd64")   echo "amd64"  ;; \
+    "linux/arm/v7")  echo "arm"   ;; \
+    "linux/arm64")   echo "arm64" ;; \
+    *)               echo ""        ;; esac) \
+  && echo "ARCH=$ARCH" \
+  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v0.9.0/sniproxy-v0.9.0-linux-${ARCH}.tar.gz | tar xvz \
+  && chmod +x sniproxy
+
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
 COPY configs/dnsdist/conf.d/SniDust.conf /etc/dnsdist/conf.d/SniDust.conf
-COPY configs/sniproxy/sniproxy.conf /etc/sniproxy.conf
 COPY domains.d /etc/snidust/domains.d
 
 COPY entrypoint.sh /entrypoint.sh
