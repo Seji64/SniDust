@@ -1,5 +1,6 @@
 FROM alpine:3.16
 LABEL org.opencontainers.image.authors="seji@tihoda.de"
+ARG TARGETPLATFORM
 
 ENV DNSDIST_BIND_IP=0.0.0.0
 ENV ALLOWED_CLIENTS=127.0.0.1
@@ -17,6 +18,8 @@ EXPOSE 5300/udp
 EXPOSE 80/tcp
 EXPOSE 443/tcp
 EXPOSE 8083/tcp
+
+RUN echo "I'm building for $TARGETPLATFORM"
 
 # Update Base
 RUN apk update && apk upgrade
@@ -36,7 +39,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
     *)               echo ""        ;; esac) \
   && echo "ARCH=$ARCH" \
   && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v0.9.0/sniproxy-v0.9.0-linux-${ARCH}.tar.gz | tar xvz \
-  && chmod +x sniproxy
+  && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
