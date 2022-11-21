@@ -34,7 +34,7 @@ chown -R dnsdist:dnsdist -R /etc/dnsdist
 echo "Starting DNSDist..."
 /usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
 echo "Starting sniproxy"
-/usr/sbin/sniproxy -c /etc/sniproxy.conf -f &
+./sniproxy --dnsPort 5300 --publicIP $EXTERNAL_IP &
 
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
 
