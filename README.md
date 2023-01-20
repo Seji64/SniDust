@@ -137,7 +137,6 @@ services:
             - '80:80'
             - '53:5300/udp'
         volumes:
-            - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
             - '~/myacls.acl:/tmp/myacls.acl:ro'
         image: 'ghcr.io/seji64/snidust:main'
 ```
