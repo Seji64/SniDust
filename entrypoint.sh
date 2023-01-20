@@ -19,8 +19,19 @@ then
   echo "Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
 fi
 
-IFS=', ' read -ra array <<< "$ALLOWED_CLIENTS"
-printf '%s\n' "${array[@]}" > /etc/dnsdist/allowedClients.acl
+if [ -z ${ALLOWED_CLIENTS_FILE} ];
+then
+  if [ -f ${ALLOWED_CLIENTS_FILE} ];
+  then
+    chown dnsdist:dnsdist $ALLOWED_CLIENTS_FILE
+    ln -s $ALLOWED_CLIENTS_FILE /etc/dnsdist/allowedClients.acl
+  else
+    echo "[ERROR] ALLOWED_CLIENTS_FILE is set but file does not exists or is not accessible!"
+  fi
+else
+  IFS=', ' read -ra array <<< "$ALLOWED_CLIENTS"
+  printf '%s\n' "${array[@]}" > /etc/dnsdist/allowedClients.acl
+fi
 
 sed -i "s/DNSDIST_BIND_IP/$DNSDIST_BIND_IP/" /etc/dnsdist/dnsdist_all.conf && \
 sed -i "s/EXTERNAL_IP/$EXTERNAL_IP/" /etc/dnsdist/dnsdist_all.conf && \
@@ -36,7 +47,7 @@ sed -i "s/DNSDIST_WEBSERVER_API_KEY/$DNSDIST_WEBSERVER_API_KEY/" /etc/dnsdist/dn
 sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_UPSTREAM_CHECK_INTERVAL/$DNSDIST_UPSTREAM_CHECK_INTERVAL/" /etc/dnsdist/dnsdist.conf
 
-chown -R dnsdist:dnsdist -R /etc/dnsdist
+chown -R dnsdist:dnsdist /etc/dnsdist
 
 echo "Starting DNSDist..."
 
