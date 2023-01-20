@@ -120,7 +120,7 @@ services:
         image: 'ghcr.io/seji64/snidust:main'
 ```
 
-## Reload allowed clients without container restart
+### Reload allowed clients without container restart
 
 In case you want to have a dynamic ALLOWED_CLIENTS ACL's change your docker-compose to this:
 
@@ -156,7 +156,7 @@ You should see in the logs (`docker logs snidust`) snidust has reloaded your acl
 [SniDust] *** ACL reload complete! ***
 ```
 
-## Reload Domains without container restart
+### Reload Domains without container restart
 
 In case you added custom domains like above, updates the `99-custom.lst` file but don't want to restart your SniDust container each time, you can reload all domains with a custom dns question.
 
