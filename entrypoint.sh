@@ -22,21 +22,32 @@ fi
 IFS=', ' read -ra array <<< "$ALLOWED_CLIENTS"
 printf '%s\n' "${array[@]}" > /etc/dnsdist/allowedClients.acl
 
+sed -i "s/DNSDIST_BIND_IP/$DNSDIST_BIND_IP/" /etc/dnsdist/dnsdist_all.conf && \
+sed -i "s/EXTERNAL_IP/$EXTERNAL_IP/" /etc/dnsdist/dnsdist_all.conf && \
+sed -i "s/DNSDIST_WEBSERVER_PASSWORD/$DNSDIST_WEBSERVER_PASSWORD/" /etc/dnsdist/dnsdist_all.conf && \
+sed -i "s/DNSDIST_WEBSERVER_API_KEY/$DNSDIST_WEBSERVER_API_KEY/" /etc/dnsdist/dnsdist_all.conf && \
+sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/dnsdist/dnsdist_all.conf && \
+sed -i "s/DNSDIST_UPSTREAM_CHECK_INTERVAL/$DNSDIST_UPSTREAM_CHECK_INTERVAL/" /etc/dnsdist/dnsdist_all.conf
 
 sed -i "s/DNSDIST_BIND_IP/$DNSDIST_BIND_IP/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/EXTERNAL_IP/$EXTERNAL_IP/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_PASSWORD/$DNSDIST_WEBSERVER_PASSWORD/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_API_KEY/$DNSDIST_WEBSERVER_API_KEY/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/dnsdist/dnsdist.conf && \
-sed -i "s/DNSDIST_UPSTREAM_CHECK_INTERVAL/$DNSDIST_UPSTREAM_CHECK_INTERVAL/" /etc/dnsdist/dnsdist.conf && \
+sed -i "s/DNSDIST_UPSTREAM_CHECK_INTERVAL/$DNSDIST_UPSTREAM_CHECK_INTERVAL/" /etc/dnsdist/dnsdist.conf
+
 chown -R dnsdist:dnsdist -R /etc/dnsdist
 
 echo "Starting DNSDist..."
+
+if [ ${SPOOF_ALL_DOMAINS} == "true" ];
+then
+/usr/bin/dnsdist -C /etc/dnsdist/dnsdist_all.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
+else
 /usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
+fi
+
 echo "Starting sniproxy"
 /usr/local/bin/sniproxy --dnsPort 5353 --publicIP $EXTERNAL_IP &
-
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
-
-
 wait -n

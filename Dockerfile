@@ -9,6 +9,7 @@ ENV DNSDIST_WEBSERVER_PASSWORD=
 ENV DNSDIST_WEBSERVER_API_KEY=
 ENV DNSDIST_WEBSERVER_NETWORKS_ACL="127.0.0.1, ::1"
 ENV DNSDIST_UPSTREAM_CHECK_INTERVAL=10
+ENV SPOOF_ALL_DOMAINS=false
 
 # HEALTHCHECKS
 HEALTHCHECK --interval=30s --timeout=3s CMD pgrep "dnsdist" > /dev/null || exit 1
@@ -43,6 +44,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
+COPY configs/dnsdist/dnsdist_all.conf /etc/dnsdist/dnsdist_all.conf
 COPY configs/dnsdist/conf.d/SniDust.conf /etc/dnsdist/conf.d/SniDust.conf
 COPY domains.d /etc/snidust/domains.d
 

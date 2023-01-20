@@ -49,6 +49,7 @@ services:
         environment:
             - ALLOWED_CLIENTS: '127.0.0.1, 10.111.123.7'
             - EXTERNAL_IP: '10.111.123.8'
+            - SPOOF_ALL_DOMAINS: 'false' # Set to true (case sensetive!) if you want spoof ALL domains.
         ports:
             - '443:443'
             - '80:80'
