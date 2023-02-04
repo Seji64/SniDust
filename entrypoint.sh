@@ -19,7 +19,7 @@ then
   echo "Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
 fi
 
-if [ -z ${ALLOWED_CLIENTS_FILE} ];
+if [ ! -z ${ALLOWED_CLIENTS_FILE} ];
 then
   if [ -f ${ALLOWED_CLIENTS_FILE} ];
   then
@@ -47,9 +47,9 @@ sed -i "s/DNSDIST_WEBSERVER_API_KEY/$DNSDIST_WEBSERVER_API_KEY/" /etc/dnsdist/dn
 sed -i "s/DNSDIST_WEBSERVER_NETWORKS_ACL/$DNSDIST_WEBSERVER_NETWORKS_ACL/" /etc/dnsdist/dnsdist.conf && \
 sed -i "s/DNSDIST_UPSTREAM_CHECK_INTERVAL/$DNSDIST_UPSTREAM_CHECK_INTERVAL/" /etc/dnsdist/dnsdist.conf
 
-chown -R dnsdist:dnsdist /etc/dnsdist
-
 echo "Starting DNSDist..."
+
+chown -R dnsdist:dnsdist /etc/dnsdist/
 
 if [ ${SPOOF_ALL_DOMAINS} == "true" ];
 then

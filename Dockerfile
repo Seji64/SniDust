@@ -40,7 +40,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
     "linux/arm64")   echo "arm64" ;; \
     *)               echo ""        ;; esac) \
   && echo "ARCH=$ARCH" \
-  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v0.9.2/sniproxy-v0.9.2-linux-${ARCH}.tar.gz | tar xvz \
+  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v0.9.1/sniproxy-v0.9.1-linux-${ARCH}.tar.gz | tar xvz \
   && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
 
 # Copy Files
@@ -50,6 +50,6 @@ COPY configs/dnsdist/conf.d/SniDust.conf /etc/dnsdist/conf.d/SniDust.conf
 COPY domains.d /etc/snidust/domains.d
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chown -R dnsdist:dnsdist /etc/dnsdist/ && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
