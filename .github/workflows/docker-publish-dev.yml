@@ -1,4 +1,4 @@
-name: Docker MultiArch Build Prod
+name: Docker MultiArch Build Dev
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -7,10 +7,8 @@ name: Docker MultiArch Build Prod
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 17 */10 * *'
   push:
-    branches: [ main ]
+    branches: [ dev ]
     paths-ignore:
       - '**/README.md'
     # Publish semver tags as releases.
@@ -73,7 +71,7 @@ jobs:
               type=semver,pattern={{major}}.{{minor}}
               type=semver,pattern={{major}}
               type=sha
-              latest
+              dev
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
