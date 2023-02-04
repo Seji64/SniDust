@@ -6,7 +6,7 @@ SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
 ## Supported Services
 
 - Zattoo
-- Wilmaa
+- Yallo.tv
 - Netflix
 - Hulu
 - Amazon Prime
@@ -118,6 +118,22 @@ services:
         volumes:
             - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
         image: 'ghcr.io/seji64/snidust:main'
+```
+
+### Spoof all domains
+
+If you don't want to maintain a list of domains and you just want to spoof everything set `SPOOF_ALL_DOMAINS` to `true`
+
+```
+version: '3.3'
+services:
+    snidust:
+        container_name: snidust
+        environment:
+            - ALLOWED_CLIENTS: '127.0.0.1, 10.111.123.7'
+            - EXTERNAL_IP: 10.111.123.8
+            - SPOOF_ALL_DOMAINS: "true"
+...
 ```
 
 ### Reload allowed clients without container restart
