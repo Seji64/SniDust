@@ -59,7 +59,7 @@ services:
 
 ### Check logs of the container
 ```
-docke logs snidust
+docker logs snidust
 ```
 
 The logs should look something like this:
