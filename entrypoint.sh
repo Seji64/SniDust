@@ -59,6 +59,6 @@ else
 fi
 
 echo "Starting sniproxy"
-/usr/local/bin/sniproxy --dnsPort 5353 --publicIP $EXTERNAL_IP &
+/usr/local/bin/sniproxy --httpPort 80 --httpsPort 443 --allDomains --dnsPort 5353 --publicIP $EXTERNAL_IP &
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
 wait -n
