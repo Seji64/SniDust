@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-echo ""
-echo "function maintenance()"
-if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
-  echo "dbrRateLimit:apply()"
-fi
-echo "end"

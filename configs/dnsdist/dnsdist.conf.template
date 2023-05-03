@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 echo ""
+echo "-- LUA"
+if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
+    echo "dbrRateLimit = dynBlockRulesGroup()"
+    echo "-- Generate a warning if we detect a query rate above ${DNSDIST_RATE_LIMIT_WARN} qps for at least ${DNSDIST_RATE_LIMIT_EVAL_WINDOW}s."
+    echo "-- If the query rate raises above ${DNSDIST_RATE_LIMIT_BLOCK} qps for ${DNSDIST_RATE_LIMIT_EVAL_WINDOW} seconds, we'll block the client for ${DNSDIST_RATE_LIMIT_BLOCK_DURATION}s."
+    echo "dbrRateLimit:setQueryRate(${DNSDIST_RATE_LIMIT_BLOCK}, ${DNSDIST_RATE_LIMIT_EVAL_WINDOW}, \"Exceeded query rate\", ${DNSDIST_RATE_LIMIT_BLOCK_DURATION}, DNSAction.Drop, ${DNSDIST_RATE_LIMIT_WARN})"
+else
+    echo "-- Rate Limiting is disabled"
+fi
+echo ""
+echo "function maintenance()"
+if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
+  echo "if (dbrRateLimit) then"
+  echo "   dbrRateLimit:apply()"
+  echo "end"
+fi
+echo "end"
+echo ""
+
+echo ""
 echo "-- Add Bind"
 echo "addLocal('${DNSDIST_BIND_IP}:5300')"
 echo ""

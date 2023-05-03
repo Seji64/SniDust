@@ -50,9 +50,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
-COPY configs/dnsdist/conf.d/00-DynBlock.conf.template /etc/dnsdist/conf.d/00-DynBlock.conf.template
-COPY configs/dnsdist/conf.d/01-LuaMaintenance.conf.template /etc/dnsdist/conf.d/01-LuaMaintenance.conf.template
-COPY configs/dnsdist/conf.d/02-SniDust.conf /etc/dnsdist/conf.d/02-SniDust.conf
+COPY configs/dnsdist/conf.d/00-SniDust.conf /etc/dnsdist/conf.d/00-SniDust.conf
 COPY domains.d /etc/snidust/domains.d
 
 COPY entrypoint.sh /entrypoint.sh
