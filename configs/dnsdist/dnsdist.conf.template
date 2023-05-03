@@ -12,9 +12,7 @@ fi
 echo ""
 echo "function maintenance()"
 if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
-  echo "if (dbrRateLimit) then"
   echo "   dbrRateLimit:apply()"
-  echo "end"
 fi
 echo "end"
 echo ""
