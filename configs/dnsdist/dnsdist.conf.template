@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+echo ""
+echo "-- LUA"
+if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
+    echo "dbrRateLimit = dynBlockRulesGroup()"
+    echo "-- Generate a warning if we detect a query rate above ${DNSDIST_RATE_LIMIT_WARN} qps for at least ${DNSDIST_RATE_LIMIT_EVAL_WINDOW}s."
+    echo "-- If the query rate raises above ${DNSDIST_RATE_LIMIT_BLOCK} qps for ${DNSDIST_RATE_LIMIT_EVAL_WINDOW} seconds, we'll block the client for ${DNSDIST_RATE_LIMIT_BLOCK_DURATION}s."
+    echo "dbrRateLimit:setQueryRate(${DNSDIST_RATE_LIMIT_BLOCK}, ${DNSDIST_RATE_LIMIT_EVAL_WINDOW}, \"Exceeded query rate\", ${DNSDIST_RATE_LIMIT_BLOCK_DURATION}, DNSAction.Drop, ${DNSDIST_RATE_LIMIT_WARN})"
+else
+    echo "-- Rate Limiting is disabled"
+fi
+echo ""
+echo "function maintenance()"
+if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
+  echo "   dbrRateLimit:apply()"
+fi
+echo "end"
+echo ""
+
+echo ""
+echo "-- Add Bind"
+echo "addLocal('${DNSDIST_BIND_IP}:5300')"
+echo ""
+
+echo "-- Include Config"
+echo "includeDirectory(\"/etc/dnsdist/conf.d\")"
+echo ""
+
+echo "-- set ACL to prevent abuse use"
+echo "setACLFromFile(\"/etc/dnsdist/allowedClients.acl\")"
+echo ""
+
+if [ "${DNSDIST_ENABLE_WEBSERVER}" == "true" ]; then
+    echo "-- Enable WebServer"
+    echo "webserver(\"127.0.0.1:8083\")"
+    echo "setWebserverConfig({password=hashPassword(\"${DNSDIST_WEBSERVER_PASSWORD}\"), apiKey=hashPassword(\"${DNSDIST_WEBSERVER_API_KEY}\"), acl=\"${DNSDIST_WEBSERVER_NETWORKS_ACL}\"})"
+    echo ""
+fi
+
+# Only add default Upstream pool if no custom is defined/configured
+if [ "${DNSDIST_UPSTREAM_POOL_NAME}" == "upstream" ]; then
+echo "-- add default upstream pool"
+echo "newServer({address=\"8.8.8.8:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+echo "newServer({address=\"8.8.4.4:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+echo "newServer({address=\"1.1.1.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+echo "newServer({address=\"1.0.0.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+echo ""
+echo "setPoolServerPolicy(roundrobin,\"upstream\")"
+echo ""
+fi
+
+if [ "${DNSDIST_DEBUG}" == "true" ]; then
+
+    echo "-- Debug logging rule"
+    echo "addAction(AllRule(), LogAction(\"/tmp/dnsdist.log\", false, true, false))"
+    echo ""
+fi
+
+echo "-- query reload.blocklist.unblockdock.local to reload Blocklist"
+echo "addAction(AndRule({QNameRule(\"reload.domainlist.snidust.local\"),QTypeRule(\"A\")}),LuaAction(ReloadBlocklist))"
+echo ""
+
+echo "-- query reload.acl.unblockdock.local to reload Blocklist"
+echo "addAction(AndRule({QNameRule(\"reload.acl.snidust.local\"),QTypeRule(\"A\")}),LuaAction(ReloadACL))"
+echo ""
+
+if [ "${SPOOF_ALL_DOMAINS}" == "true" ]; then
+    echo " -- rewrite it for ALL Domains"
+    echo "addAction(AllRule(), SpoofAction(\"EXTERNAL_IP\"))"
+else
+    echo "-- Tag dq if domain is on Blocklist"
+    echo "addAction(SuffixMatchNodeRule(BlockNode), SetTagAction(\"rewrite\",\"true\"))"
+    echo ""
+    echo "-- If dq has Tag --> rewrite it"
+    echo "addAction(TagRule(\"rewrite\",\"true\"), SpoofAction(\"${EXTERNAL_IP}\"))"
+    echo ""
+fi
+
+echo "-- Fallback if dq has tag but QType was not A,AAAA or CNAME"
+echo "addAction(TagRule(\"rewrite\",\"true\"), RCodeAction(DNSRCode.NXDOMAIN))"
+echo ""
+
+echo "-- Default -> send to Upstream Pool"
+echo "addAction(AllRule(),PoolAction(\"${DNSDIST_UPSTREAM_POOL_NAME}\"))"

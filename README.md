@@ -90,6 +90,43 @@ In case systemd is already using port 53 you can follow this [Guide](https://www
 
 ## Advanced
 
+### Configure DNS Rate Limiting
+The default is the following:
+```
+Generate a warning if we detect a query rate above 800 qps for at least 60s."
+If the query rate raises above 1000 qps for 60 seconds, we'll block the client for 360s."
+```
+To customize this behavior you can use the following environment variables:
+````
+DNSDIST_RATE_LIMIT_WARN (default: 800)
+DNSDIST_RATE_LIMIT_BLOCK (default: 1000)
+DNSDIST_RATE_LIMIT_BLOCK_DURATION (default: 360)
+DNSDIST_RATE_LIMIT_EVAL_WINDOW (default: 60)
+````
+
+If you want disable Rate Limiting completely set `DNSDIST_RATE_LIMIT_DISABLE` to `true`
+
+### Use custom Upstream DNS Servers
+By default SniDust is using Cloudflare's and Google's DNS Servers as Upstream.
+To use your own/custom upstream DNS Server you have to do the following:
+
+#### Configure and use Custom Upstream Pool
+- Create a file named 99-customUpstream.conf
+- Use the [DNSDist Documentation](https://dnsdist.org/reference/config.html#newServer) to create you own upstream pool.
+  Example:
+  ```
+  newServer("192.0.2.1", name="custom1", pool="customUpstream")
+  newServer("192.0.2.2", name="custom2", pool="customUpstream")
+  ```
+ - Ensure you have set a `pool` and it is **NOT** named `upstream` (this name is already used by sniDust itself)
+ - Set Environment Variable `DNSDIST_UPSTREAM_POOL_NAME` to your pool name *(here: `customUpstream`)*
+ - Map your file `99-customUpstream.conf`
+   ```
+   ...
+           volumes:
+            - ~/99-customUpstream.conf:/etc/dnsdist/conf.d/99-customUpstream.conf
+    ...
+   ```
 ### Add custom domains
 
 In case you want to add custom domains which not included by default, this can be done easily.

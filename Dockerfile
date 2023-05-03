@@ -1,4 +1,4 @@
-FROM alpine:3.16
+FROM alpine:3.17
 LABEL org.opencontainers.image.authors="seji@tihoda.de"
 ARG TARGETPLATFORM
 
@@ -10,10 +10,16 @@ ENV DNSDIST_WEBSERVER_PASSWORD=
 ENV DNSDIST_WEBSERVER_API_KEY=
 ENV DNSDIST_WEBSERVER_NETWORKS_ACL="127.0.0.1, ::1"
 ENV DNSDIST_UPSTREAM_CHECK_INTERVAL=10
+ENV DNSDIST_UPSTREAM_POOL_NAME="upstream"
+ENV DNSDIST_RATE_LIMIT_DISABLE=false
+ENV DNSDIST_RATE_LIMIT_WARN=800
+ENV DNSDIST_RATE_LIMIT_BLOCK=1000
+ENV DNSDIST_RATE_LIMIT_BLOCK_DURATION=360
+ENV DNSDIST_RATE_LIMIT_EVAL_WINDOW=60
 ENV SPOOF_ALL_DOMAINS=false
 
 # HEALTHCHECKS
-HEALTHCHECK --interval=30s --timeout=3s CMD pgrep "dnsdist" > /dev/null || exit 1
+HEALTHCHECK --interval=30s --timeout=3s CMD (pgrep "dnsdist" > /dev/null && pgrep "sniproxy" > /dev/null) || exit 1
 
 # Expose Ports
 EXPOSE 5300/udp
@@ -44,9 +50,8 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
   && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
 
 # Copy Files
-COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
-COPY configs/dnsdist/dnsdist_all.conf /etc/dnsdist/dnsdist_all.conf
-COPY configs/dnsdist/conf.d/SniDust.conf /etc/dnsdist/conf.d/SniDust.conf
+COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
+COPY configs/dnsdist/conf.d/00-SniDust.conf /etc/dnsdist/conf.d/00-SniDust.conf
 COPY domains.d /etc/snidust/domains.d
 
 COPY entrypoint.sh /entrypoint.sh
