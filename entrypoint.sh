@@ -39,7 +39,8 @@ fi
 echo "Generating DNSDist Configs..."
 /bin/bash /etc/dnsdist/dnsdist.conf.template > /etc/dnsdist/dnsdist.conf
 /bin/bash /etc/dnsdist/conf.d/00-DynBlock.conf.template > /etc/dnsdist/conf.d/00-DynBlock.conf
-rm /etc/dnsdist/dnsdist.conf.template /etc/dnsdist/conf.d/00-DynBlock.conf.template
+/bin/bash /etc/dnsdist/conf.d/01-LuaMaintenance.conf.template > /etc/dnsdist/conf.d/01-LuaMaintenance.conf
+rm /etc/dnsdist/dnsdist.conf.template /etc/dnsdist/conf.d/00-DynBlock.conf.template /etc/dnsdist/conf.d/01-LuaMaintenance.conf.template
 
 echo "Starting DNSDist..."
 chown -R dnsdist:dnsdist /etc/dnsdist/

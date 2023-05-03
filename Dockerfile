@@ -10,6 +10,7 @@ ENV DNSDIST_WEBSERVER_PASSWORD=
 ENV DNSDIST_WEBSERVER_API_KEY=
 ENV DNSDIST_WEBSERVER_NETWORKS_ACL="127.0.0.1, ::1"
 ENV DNSDIST_UPSTREAM_CHECK_INTERVAL=10
+ENV DNSDIST_RATE_LIMIT_DISABLE=false
 ENV DNSDIST_RATE_LIMIT_WARN=800
 ENV DNSDIST_RATE_LIMIT_BLOCK=1000
 ENV DNSDIST_RATE_LIMIT_BLOCK_DURATION=360
@@ -50,7 +51,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
 COPY configs/dnsdist/conf.d/00-DynBlock.conf.template /etc/dnsdist/conf.d/00-DynBlock.conf.template
-COPY configs/dnsdist/conf.d/01-LuaMaintenance.conf /etc/dnsdist/conf.d/01-LuaMaintenance.conf
+COPY configs/dnsdist/conf.d/01-LuaMaintenance.conf.template /etc/dnsdist/conf.d/01-LuaMaintenance.conf.template
 COPY configs/dnsdist/conf.d/02-SniDust.conf /etc/dnsdist/conf.d/02-SniDust.conf
 COPY domains.d /etc/snidust/domains.d
 

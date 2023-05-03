@@ -90,6 +90,22 @@ In case systemd is already using port 53 you can follow this [Guide](https://www
 
 ## Advanced
 
+### Configure DNS Rate Limiting
+The default is the following:
+```
+Generate a warning if we detect a query rate above 800 qps for at least 60s."
+If the query rate raises above 1000 qps for 60 seconds, we'll block the client for 360s."
+```
+To customize this behavior you can use the following environment variables:
+````
+DNSDIST_RATE_LIMIT_WARN (default: 800)
+DNSDIST_RATE_LIMIT_BLOCK (default: 1000)
+DNSDIST_RATE_LIMIT_BLOCK_DURATION (default: 360)
+DNSDIST_RATE_LIMIT_EVAL_WINDOW (default: 60)
+````
+
+If you want disable Rate Limiting completely set `DNSDIST_RATE_LIMIT_DISABLE` to `true`
+
 ### Add custom domains
 
 In case you want to add custom domains which not included by default, this can be done easily.
