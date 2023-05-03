@@ -17,7 +17,7 @@ ENV DNSDIST_RATE_LIMIT_EVAL_WINDOW=60
 ENV SPOOF_ALL_DOMAINS=false
 
 # HEALTHCHECKS
-HEALTHCHECK --interval=30s --timeout=3s CMD pgrep "dnsdist" > /dev/null || exit 1
+HEALTHCHECK --interval=30s --timeout=3s CMD (pgrep "dnsdist" > /dev/null && pgrep "sniproxy" > /dev/null) || exit 1
 
 # Expose Ports
 EXPOSE 5300/udp
