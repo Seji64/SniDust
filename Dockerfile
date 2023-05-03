@@ -1,4 +1,4 @@
-FROM alpine:3.16
+FROM alpine:3.17
 LABEL org.opencontainers.image.authors="seji@tihoda.de"
 ARG TARGETPLATFORM
 
@@ -44,8 +44,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
   && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
 
 # Copy Files
-COPY configs/dnsdist/dnsdist.conf /etc/dnsdist/dnsdist.conf
-COPY configs/dnsdist/dnsdist_all.conf /etc/dnsdist/dnsdist_all.conf
+COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
 COPY configs/dnsdist/conf.d/SniDust.conf /etc/dnsdist/conf.d/SniDust.conf
 COPY domains.d /etc/snidust/domains.d
 
