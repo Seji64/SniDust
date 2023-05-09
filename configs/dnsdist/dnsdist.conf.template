@@ -66,7 +66,7 @@ echo ""
 
 if [ "${SPOOF_ALL_DOMAINS}" == "true" ]; then
     echo " -- rewrite it for ALL Domains"
-    echo "addAction(AllRule(), SpoofAction(\"EXTERNAL_IP\"))"
+    echo "addAction(AllRule(), SpoofAction(\"${EXTERNAL_IP}\"))"
 else
     echo "-- Tag dq if domain is on Blocklist"
     echo "addAction(SuffixMatchNodeRule(BlockNode), SetTagAction(\"rewrite\",\"true\"))"
