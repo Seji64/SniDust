@@ -1,4 +1,4 @@
-FROM alpine:3.17
+FROM alpine:3.18
 LABEL org.opencontainers.image.authors="seji@tihoda.de"
 ARG TARGETPLATFORM
 
@@ -33,11 +33,12 @@ RUN echo "I'm building for $TARGETPLATFORM"
 RUN apk update && apk upgrade
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist curl bash sed gnupg procps ca-certificates openssl dog lua5.3-filesystem && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d && \
-    mkdir -p /etc/snidust/
+    mkdir -p /etc/snidust/ && \
+    mkdir -p /etc/sniproxy/
 
 # Download and install sniproxy
 RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
@@ -46,13 +47,14 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
     "linux/arm64")   echo "arm64" ;; \
     *)               echo ""        ;; esac) \
   && echo "ARCH=$ARCH" \
-  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v1.0.0/sniproxy-v1.0.0-linux-${ARCH}.tar.gz | tar xvz \
+  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v2.0.1/sniproxy-v2.0.1-linux-${ARCH}.tar.gz | tar xvz \
   && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
 COPY configs/dnsdist/conf.d/00-SniDust.conf /etc/dnsdist/conf.d/00-SniDust.conf
 COPY domains.d /etc/snidust/domains.d
+COPY configs/sniproxy/config.yaml /etc/sniproxy/config.yaml
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chown -R dnsdist:dnsdist /etc/dnsdist/ && chmod +x /entrypoint.sh

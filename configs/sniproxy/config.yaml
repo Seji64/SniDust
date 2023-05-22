@@ -1,0 +1,67 @@
+general:
+  # Upsteam DNS URI. examples: Upstream DNS URI. examples: udp://1.1.1.1:53, tcp://1.1.1.1:53, tcp-tls://1.1.1.1:853, https://dns.google/dns-query
+  upstream_dns: udp://8.8.8.8:53
+  # enable send DNS through socks5
+  upstream_dns_over_socks5: false
+  # Use a SOCKS proxy for upstream HTTP/HTTPS traffic. Example: socks5://admin:
+  upstream_socks5:
+  # DNS Port to listen on. Should remain 53 in most cases. MUST NOT be empty
+  bind_dns_over_udp: "0.0.0.0:53"
+  # enable DNS over TCP. empty disables it. example: "127.0.0.1:53"
+  bind_dns_over_tcp:
+  # enable DNS over TLS. empty disables it. example: "127.0.0.1:853"
+  bind_dns_over_tls:
+  # enable DNS over QUIC. empty disables it. example: "127.0.0.1:8853"
+  bind_dns_over_quic:
+  # Path to the certificate for DoH, DoT and DoQ. eg: /tmp/mycert.pem
+  tls_cert:
+  # Path to the certificate key for DoH, DoT and DoQ. eg: /tmp/mycert.key
+  tls_key:
+  # HTTP Port to listen on. Should remain 80 in most cases
+  bind_http: "0.0.0.0:80"
+  # HTTPS Port to listen on. Should remain 443 in most cases
+  bind_https: "0.0.0.0:443"
+  # Enable prometheus endpoint on IP:PORT. example: 127.0.0.1:8080. Always exposes /metrics and only supports HTTP
+  bind_prometheus:
+  # Interface used for outbound TLS connections. uses OS prefered one if empty
+  interface:
+  # Public IPv4 of the server, reply address of DNS A queries
+  public_ipv4:
+  # Public IPv6 of the server, reply address of DNS AAAA queries
+  public_ipv6:
+  # log level for the application. choices: debug, info, warn, error
+  # by default, the logs are colored so they are not suited for logging to a file.
+  # in order to disable colors, set NO_COLOR=true in the environment variables
+  log_level: info
+
+acl:
+  # geoip filtering
+  #
+  # the logic is as follows:
+  # 1. if mmdb is not loaded or not available, it's fail-open (allow by default)
+  # 2. if the IP can't be resolved to a country, it's rejected
+  # 3. if the country is in the blocked list, it's rejected
+  # 4. if the country is in the allowed list, it's allowed
+  # note that the reject list is checked first and takes priority over the allow list
+  # if the IP's country doesn't match any of the above, it's allowed if the blocked list is not empty
+  # for example, if the blockedlist is [US] and the allowedlist is empty, a connection from
+  # CA will be allowed. but if blockedlist is empty and allowedlist is [US], a connection from
+  # CA will be rejected.
+  geoip:
+    enabled: false
+  # domain filtering
+  domain:
+    enabled: false # false means ALL domains will be allowed to go through the proxy
+  # IP/CIDR filtering
+  cidr:
+    enabled: true
+    # priority of the cidr filter. lower priority means it's checked first. if multiple filters have the same priority, they're checked in random order
+    priority: 10
+    # Path to the CIDR list. eg: /tmp/cidr.csv. Look at the example file for the format.
+    path: /etc/sniproxy/allowedClients.acl
+    # Interval to re-fetch the domain list
+    refresh_interval: 0h1m0s
+  # FQDN override. This ACL is used to override the destination IP to not be the one resolved by the upstream DNS or the proxy itself, rather a custom IP and port
+  # if the destination is HTTP, it uses tls_cert and tls_key certificate to terminate the original connection. 
+  override:
+    enabled: false

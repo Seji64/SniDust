@@ -22,7 +22,7 @@ then
   echo "Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
 fi
 
-if [ ! -z "${ALLOWED_CLIENTS_FILE}" ];
+if [ -n "${ALLOWED_CLIENTS_FILE}" ];
 then
   if [ -f "${ALLOWED_CLIENTS_FILE}" ];
   then
@@ -36,6 +36,14 @@ else
   printf '%s\n' "${array[@]}" > /etc/dnsdist/allowedClients.acl
 fi
 
+if [ -f "/etc/dnsdist/allowedClients.acl" ];
+then
+  while IFS= read -r line
+  do
+    echo "$line,allow" >> /etc/sniproxy/allowedClients.acl
+  done < "/etc/dnsdist/allowedClients.acl"
+fi
+
 echo "Generating DNSDist Configs..."
 /bin/bash /etc/dnsdist/dnsdist.conf.template > /etc/dnsdist/dnsdist.conf
 
@@ -44,6 +52,6 @@ chown -R dnsdist:dnsdist /etc/dnsdist/
 /usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
 
 echo "Starting sniproxy"
-/usr/local/bin/sniproxy --httpPort 80 --httpsPort 443 --allDomains --dnsPort 5353 --publicIP "$EXTERNAL_IP" &
+/usr/local/bin/sniproxy --config "/etc/sniproxy/config.yaml" &
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
 wait -n
