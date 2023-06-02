@@ -47,7 +47,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
     "linux/arm64")   echo "arm64" ;; \
     *)               echo ""        ;; esac) \
   && echo "ARCH=$ARCH" \
-  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v2.0.1/sniproxy-v2.0.1-linux-${ARCH}.tar.gz | tar xvz \
+  && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v2.0.3/sniproxy-v2.0.3-linux-${ARCH}.tar.gz | tar xvz \
   && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
 
 # Copy Files
