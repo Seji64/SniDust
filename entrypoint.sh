@@ -26,7 +26,6 @@ if [ -n "${ALLOWED_CLIENTS_FILE}" ];
 then
   if [ -f "${ALLOWED_CLIENTS_FILE}" ];
   then
-    chown dnsdist:dnsdist "$ALLOWED_CLIENTS_FILE"
     ln -s "$ALLOWED_CLIENTS_FILE" /etc/dnsdist/allowedClients.acl
   else
     echo "[ERROR] ALLOWED_CLIENTS_FILE is set but file does not exists or is not accessible!"
