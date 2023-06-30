@@ -52,6 +52,6 @@ chown -R dnsdist:dnsdist /etc/dnsdist/
 /usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
 
 echo "Starting sniproxy"
-/usr/local/bin/sniproxy --config "/etc/sniproxy/config.yaml" &
+/usr/local/bin/sniproxy --config "/etc/sniproxy/config.yaml" --publicIPv4 "$EXTERNAL_IP" &
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
 wait -n
