@@ -24,14 +24,14 @@ You will need a VPS or a Root Server where you can install [Docker](https://www.
 ## run this in your terminal or use your webbrowser
 curl https://ifconfig.me
 ```
-For this **example** i we assume your public ip (of your *client*) is `10.111.123.7`
+For this **example**  lets assume your public ip (of your *client*) is `10.111.123.7`
 
 ### Get your IP of your Server
 
 ```
 curl https://ifconfig.me
 ```
-For this **example** i we assume your public ip (of your *server*) is `10.111.123.8`
+For this **example** lets assume your public ip (of your *server*) is `10.111.123.8`
 
 ### Run SniDust on your Server
 
@@ -39,26 +39,26 @@ For this **example** i we assume your public ip (of your *server*) is `10.111.12
 docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" -e EXTERNAL_IP=10.111.123.8 -p 443:443 -p 80:80 -p 53:5300/udp ghcr.io/seji64/snidust:main
 ```
 
-Or if you use docker-compose:
+Or if you use docker compose:
 
-```
+```yaml
 version: '3.3'
 services:
     snidust:
         container_name: snidust
         environment:
-            - 'ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7'
+            - ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7
             - EXTERNAL_IP=10.111.123.8
-            - SPOOF_ALL_DOMAINS=false # Set to true (case sensetive!) if you want spoof ALL domains.
+            - SPOOF_ALL_DOMAINS=false # Set to true (case sensitive!) if you want to spoof ALL domains.
         ports:
-            - '443:443'
-            - '80:80'
-            - '53:5300/udp'
+            - 443:443
+            - 80:80
+            - 53:5300/udp
         image: 'ghcr.io/seji64/snidust:main'
 ```
 
 ### Check logs of the container
-```
+```bash
 docker logs snidust
 ```
 
@@ -76,7 +76,7 @@ Polled security status of version 1.7.1 at startup, no known issues reported: OK
 
 ### Configure your client
 
-Change your network settings and set as DNS Server 10.111.123.8 (PUBLIC_VPS_IP)
+Change your network settings and set the DNS Server as  10.111.123.8 (**PUBLIC_VPS_IP**)
 
 Your GeoLaction should now hidden :-)
 
@@ -84,17 +84,17 @@ Your GeoLaction should now hidden :-)
 
 ### Error Port 53 is already in use
 
-In this case you either run another service (like Pi-Hole) which already uses this Port or you likely use an linux distribution which uses systemd.
+In this case, you are either running another service (like Pi-Hole) that already uses this Port or you likely use a Linux distribution that uses Systemd.
 
-In case systemd is already using port 53 you can follow this [Guide](https://www.linuxuprising.com/2020/07/ubuntu-how-to-free-up-port-53-used-by.html) to free up this port.
+In case Systemd is already using port 53 you can follow this [Guide](https://www.linuxuprising.com/2020/07/ubuntu-how-to-free-up-port-53-used-by.html) to free up this port.
 
-## Advanced
+## Advanced setups
 
 ### Configure DNS Rate Limiting
 The default is the following:
 ```
-Generate a warning if we detect a query rate above 800 qps for at least 60s."
-If the query rate raises above 1000 qps for 60 seconds, we'll block the client for 360s."
+Generate a warning if we detect a query rate above 800 qps *(Query per second)* for at least 60s.
+If the query rate rises above 1000 qps for 60 seconds, we'll block the client for 360s.
 ```
 To customize this behavior you can use the following environment variables:
 ````
@@ -104,10 +104,10 @@ DNSDIST_RATE_LIMIT_BLOCK_DURATION (default: 360)
 DNSDIST_RATE_LIMIT_EVAL_WINDOW (default: 60)
 ````
 
-If you want disable Rate Limiting completely set `DNSDIST_RATE_LIMIT_DISABLE` to `true`
+If you want to disable Rate Limiting completely set `DNSDIST_RATE_LIMIT_DISABLE` to `true`
 
 ### Use custom Upstream DNS Servers
-By default SniDust is using Cloudflare's and Google's DNS Servers as Upstream.
+By default, SniDust is using Cloudflare's and Google's DNS Servers as Upstream.
 To use your own/custom upstream DNS Server you have to do the following:
 
 #### Configure and use Custom Upstream Pool
@@ -124,7 +124,7 @@ To use your own/custom upstream DNS Server you have to do the following:
    ```
    ...
            volumes:
-            - ~/99-customUpstream.conf:/etc/dnsdist/conf.d/99-customUpstream.conf
+             - ~/99-customUpstream.conf:/etc/dnsdist/conf.d/99-customUpstream.conf
     ...
    ```
 ### Add custom domains
@@ -134,13 +134,13 @@ Create a file with the name `99-custom.lst`. Insert all your custom domains in t
 
 #### Mount it
 
-```
+```bash
 docker run --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" -e EXTERNAL_IP=10.111.123.8 -p 443:443 -p 80:80 -p 53:5300/udp -v ~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro ghcr.io/seji64/snidust:main
 ```
 
 Or if you use docker-compose:
 
-```
+```yaml
 version: '3.3'
 services:
     snidust:
@@ -161,7 +161,7 @@ services:
 
 If you don't want to maintain a list of domains and you just want to spoof everything set `SPOOF_ALL_DOMAINS` to `true`
 
-```
+```yaml
 version: '3.3'
 services:
     snidust:
@@ -175,9 +175,9 @@ services:
 
 ### Reload allowed clients without container restart
 
-In case you want to have a dynamic ALLOWED_CLIENTS ACL's change your docker-compose to this:
+In case you want to have dynamic ALLOWED_CLIENTS ACL change your docker compose file to this:
 
-```
+```yaml
 version: '3.3'
 services:
     snidust:
@@ -194,13 +194,13 @@ services:
         image: 'ghcr.io/seji64/snidust:main'
 ```
 
-Then you can reload your acls by querying a specific dns name:
+Then you can reload your ACLs by querying a specific DNS name:
 ```
-# assuming 10.11.123.8 is your ip of your Server where snidust runs
+# Assuming 10.11.123.8 is the IP of your Server where snidust runs
 dig @10.111.123.8 reload.acl.snidust.local
 ```
 
-You should see in the logs (`docker logs snidust`) snidust has reloaded your acl's
+You should see in the logs (`docker logs snidust`) snidust has reloaded your ACLs
 
 ```
 [SniDust] *** Reloading ACL... ***
@@ -210,17 +210,17 @@ You should see in the logs (`docker logs snidust`) snidust has reloaded your acl
 
 ### Reload Domains without container restart
 
-In case you added custom domains like above, updates the `99-custom.lst` file but don't want to restart your SniDust container each time, you can reload all domains with a custom dns question.
+In case you added custom domains like the above, update the `99-custom.lst` file but don't want to restart your SniDust container each time, you can reload all domains with a custom DNS question.
 
 ```
-# assuming 10.11.123.8 is your ip of your Server where snidust runs
+# Assuming 10.11.123.8 is the IP of your Server where snidust runs
 dig @10.111.123.8 reload.domainlist.snidust.local
 ```
 
 You should see in the logs (`docker logs snidust`) snidust has reloaded your domain
 
 ```
-[SniDust] Reloading domain lists..
+[SniDust] Reloading domain lists...
 ...
 [SniDust] *** End of Domain List ***
 [SniDust] Domain Lists reloaded!
