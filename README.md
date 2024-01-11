@@ -25,6 +25,7 @@ You will need a VPS or a Root Server where you can install [Docker](https://www.
 curl https://ifconfig.me
 ```
 For this **example**  lets assume your public ip (of your *client*) is `10.111.123.7`
+Since version `v1.0.8` you can also use DyDNS. In this case just use your DnyDNS domain eg. `myDynDNSDomain.no-ip.com`
 
 ### Get your IP of your Server
 
@@ -36,7 +37,7 @@ For this **example** lets assume your public ip (of your *server*) is `10.111.12
 ### Run SniDust on your Server
 
 ```
-docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" -e EXTERNAL_IP=10.111.123.8 -p 443:443 -p 80:80 -p 53:5300/udp ghcr.io/seji64/snidust:main
+docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" -e EXTERNAL_IP=10.111.123.8 -p 443:443 -p 80:80 -p 53:5300/udp ghcr.io/seji64/snidust:main
 ```
 
 Or if you use docker compose:
@@ -47,7 +48,7 @@ services:
     snidust:
         container_name: snidust
         environment:
-            - ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7
+            - ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com
             - EXTERNAL_IP=10.111.123.8
             - SPOOF_ALL_DOMAINS=false # Set to true (case sensitive!) if you want to spoof ALL domains.
         ports:
@@ -160,6 +161,7 @@ services:
 ### Spoof all domains
 
 If you don't want to maintain a list of domains and you just want to spoof everything set `SPOOF_ALL_DOMAINS` to `true`
+**WARNING:**: As a result, the COMPLETE traffic runs through your VPS - this is not the optimal use of SniDust. Only the traffic needed to cloak the GeoLocation should flow through SniDust
 
 ```yaml
 version: '3.3'
