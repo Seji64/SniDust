@@ -25,7 +25,7 @@ You will need a VPS or a Root Server where you can install [Docker](https://www.
 curl https://ifconfig.me
 ```
 For this **example**  lets assume your public ip (of your *client*) is `10.111.123.7`
-Since version `v1.0.8` you can also use DyDNS. In this case just use your DnyDNS domain eg. `myDynDNSDomain.no-ip.com`
+Since version `v1.0.8` you can also use DynDNS. In this case just use your DynDNS domain eg. `myDynDNSDomain.no-ip.com`
 
 ### Get your IP of your Server
 
