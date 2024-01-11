@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 echo ""
 echo "-- LUA"
 if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then

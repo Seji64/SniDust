@@ -17,6 +17,7 @@ ENV DNSDIST_RATE_LIMIT_BLOCK=1000
 ENV DNSDIST_RATE_LIMIT_BLOCK_DURATION=360
 ENV DNSDIST_RATE_LIMIT_EVAL_WINDOW=60
 ENV SPOOF_ALL_DOMAINS=false
+ENV DNYDNS_CRON_SCHEDULE="*/15 * * * *"
 
 # HEALTHCHECKS
 HEALTHCHECK --interval=30s --timeout=3s CMD (pgrep "dnsdist" > /dev/null && pgrep "sniproxy" > /dev/null) || exit 1
@@ -33,7 +34,7 @@ RUN echo "I'm building for $TARGETPLATFORM"
 RUN apk update && apk upgrade
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d && \
@@ -57,6 +58,12 @@ COPY domains.d /etc/snidust/domains.d
 COPY configs/sniproxy/config.yaml /etc/sniproxy/config.yaml
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chown -R dnsdist:dnsdist /etc/dnsdist/ && chmod +x /entrypoint.sh
+COPY generateACL.sh /generateACL.sh
+COPY dynDNSCron.sh /dynDNSCron.sh
+RUN chown -R dnsdist:dnsdist /etc/dnsdist/ && \
+    chmod +x /entrypoint.sh && \
+    chmod +x /generateACL.sh && \
+    chmod +x dynDNSCron.sh
 
-ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["/bin/bash", "/entrypoint.sh"]
