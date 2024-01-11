@@ -1,6 +1,6 @@
 #!/bin/bash
 CLIENTS=()
-export DYNDNS_CRON_ENABLED=$false
+export DYNDNS_CRON_ENABLED=false
 
 if [ -n "${ALLOWED_CLIENTS_FILE}" ];
 then
@@ -21,14 +21,14 @@ else
       RESOLVE_RESULT=$(/usr/bin/dog --short --type A ${i})
       retVal=$?
       if [ $retVal -eq 0 ]; then
-        export DYNDNS_CRON_ENABLED=$true
+        export DYNDNS_CRON_ENABLED=true
         CLIENTS+=( ${RESOLVE_RESULT} )
       else
         echo "[ERROR] Could not resolve '${i}' => Skipping"
       fi
     fi
   done
-  if [[ ! "${array[@]}" =~ '127.0.0.1' ]] && [[ "$DYNDNS_CRON_ENABLED" -eq $true ]]; then
+  if [[ ! "${array[@]}" =~ '127.0.0.1' ]] && [[ "$DYNDNS_CRON_ENABLED" = true ]]; then
     echo "[INFO] Adding '127.0.0.1' to allowed clients cause else cron reload will not work"
     CLIENTS+=( "127.0.0.1" )
   fi
