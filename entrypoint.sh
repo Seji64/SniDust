@@ -31,7 +31,7 @@ set -e
 echo "[INFO] Generating DNSDist Configs..."
 /bin/bash /etc/dnsdist/dnsdist.conf.template > /etc/dnsdist/dnsdist.conf
 
-if [ -z "${DYNDNS_CRON_ENABLED}" ];
+if [[ "$DYNDNS_CRON_ENABLED" -eq $true ]];
 then
   echo "[INFO] DynDNS Address in ALLOWED_CLIENTS detected => Enable cron job"
   echo "$DNYDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/crontabs/root
