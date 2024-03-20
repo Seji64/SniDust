@@ -34,7 +34,7 @@ RUN echo "I'm building for $TARGETPLATFORM"
 RUN apk update && apk upgrade
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d && \
@@ -49,7 +49,7 @@ RUN ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
     *)               echo ""        ;; esac) \
   && echo "ARCH=$ARCH" \
   && curl -sSL https://github.com/mosajjal/sniproxy/releases/download/v2.0.4/sniproxy-v2.0.4-linux-${ARCH}.tar.gz | tar xvz \
-  && chmod +x sniproxy && install sniproxy /usr/local/bin && rm sniproxy
+  && chmod +x sniproxy && install sniproxy /usr/local/bin && setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/sniproxy && rm sniproxy
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
