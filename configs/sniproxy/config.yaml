@@ -5,8 +5,8 @@ general:
   upstream_dns_over_socks5: false
   # Use a SOCKS proxy for upstream HTTP/HTTPS traffic. Example: socks5://admin:
   upstream_socks5:
-  # DNS Port to listen on. Should remain 53 in most cases. MUST NOT be empty
-  bind_dns_over_udp: "0.0.0.0:53"
+  # DNS Port to listen on. Should remain 53 in most cases. MUST NOT be empty. Bind to dummy Port cause we use dnsdist
+  bind_dns_over_udp: "127.0.0.1:1234"
   # enable DNS over TCP. empty disables it. example: "127.0.0.1:53"
   bind_dns_over_tcp:
   # enable DNS over TLS. empty disables it. example: "127.0.0.1:853"
@@ -59,8 +59,8 @@ acl:
     priority: 10
     # Path to the CIDR list. eg: /tmp/cidr.csv. Look at the example file for the format.
     path: /etc/sniproxy/allowedClients.acl
-    # Interval to re-fetch the domain list
-    refresh_interval: 0h1m0s
+    # Interval to re-fetch the cidr list
+    refresh_interval: 1h0m0s
   # FQDN override. This ACL is used to override the destination IP to not be the one resolved by the upstream DNS or the proxy itself, rather a custom IP and port
   # if the destination is HTTP, it uses tls_cert and tls_key certificate to terminate the original connection. 
   override:

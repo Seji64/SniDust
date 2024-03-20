@@ -34,13 +34,12 @@ echo "[INFO] Generating DNSDist Configs..."
 if [ "$DYNDNS_CRON_ENABLED" = true ];
 then
   echo "[INFO] DynDNS Address in ALLOWED_CLIENTS detected => Enable cron job"
-  echo "$DNYDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/crontabs/root
+  echo "$DNYDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/crontabs/snidust
   crond -f &
 fi
 
 echo "[INFO] Starting DNSDist..."
-chown -R dnsdist:dnsdist /etc/dnsdist/
-/usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid dnsdist --gid dnsdist &
+/usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid snidust --gid snidust &
 
 echo "[INFO] Starting sniproxy"
 (until /usr/local/bin/sniproxy --config "/etc/sniproxy/config.yaml"; do

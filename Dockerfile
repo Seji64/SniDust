@@ -60,10 +60,16 @@ COPY configs/sniproxy/config.yaml /etc/sniproxy/config.yaml
 COPY entrypoint.sh /entrypoint.sh
 COPY generateACL.sh /generateACL.sh
 COPY dynDNSCron.sh /dynDNSCron.sh
-RUN chown -R dnsdist:dnsdist /etc/dnsdist/ && \
+
+RUN addgroup snidust && adduser -D -H -G snidust snidust
+
+RUN chown -R snidust:snidust /etc/dnsdist/ && \
+    chown -R snidust:snidust /etc/sniproxy/ && \
     chmod +x /entrypoint.sh && \
     chmod +x /generateACL.sh && \
     chmod +x dynDNSCron.sh
+
+USER snidust
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]

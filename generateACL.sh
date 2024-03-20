@@ -6,7 +6,7 @@ if [ -n "${ALLOWED_CLIENTS_FILE}" ];
 then
   if [ -f "${ALLOWED_CLIENTS_FILE}" ];
   then
-    cat "$ALLOWED_CLIENTS_FILE" >> /etc/dnsdist/allowedClients.acl
+    cat "$ALLOWED_CLIENTS_FILE" > /etc/dnsdist/allowedClients.acl
   else
     echo "[ERROR] ALLOWED_CLIENTS_FILE is set but file does not exists or is not accessible!"
   fi
