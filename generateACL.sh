@@ -37,8 +37,10 @@ fi
 
 if [ -f "/etc/dnsdist/allowedClients.acl" ];
 then
+  echo "" > /etc/sniproxy/allowedClients.acl
   while read -r line
   do
       echo "$line,allow" >> /etc/sniproxy/allowedClients.acl
+      echo "0.0.0.0/0,deny" >> /etc/sniproxy/allowedClients.acl
   done < "/etc/dnsdist/allowedClients.acl"
 fi
