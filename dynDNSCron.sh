@@ -11,8 +11,7 @@ else
   echo "[ERROR] [DnyDNSCron] Failed to reload DnsDist ACL config!"
 fi
 
-touch /tmp/reload_sni_proxy
-echo "[INFO] [DnyDNSCron] Reloading/Restarting Sniproxy..."
-PID_SNIPROXY=$(pidof sniproxy)
-kill -HUP $PID_SNIPROXY
-echo "[INFO] [DnyDNSCron] Sniproxy successfully reloaded/restarted"
+
+echo "[INFO] [DnyDNSCron] reloading nginx..."
+/usr/sbin/nginx -s reload
+echo "[INFO] [DnyDNSCron] ngix successfully reloaded"

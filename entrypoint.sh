@@ -28,7 +28,7 @@ source generateACL.sh
 set -e
 
 
-echo "[INFO] Generating DNSDist Configs..."
+echo "[INFO] Generating DNSDist Config..."
 /bin/bash /etc/dnsdist/dnsdist.conf.template > /etc/dnsdist/dnsdist.conf
 
 if [ "$DYNDNS_CRON_ENABLED" = true ];
@@ -41,16 +41,9 @@ fi
 echo "[INFO] Starting DNSDist..."
 /usr/bin/dnsdist -C /etc/dnsdist/dnsdist.conf --supervised --disable-syslog --uid snidust --gid snidust &
 
-echo "[INFO] Starting sniproxy"
-(until /usr/local/bin/sniproxy --config "/etc/sniproxy/config.yaml"; do
-    if [ -f "/tmp/reload_sni_proxy" ];
-    then
-      # ignore => restarted by cron
-      rm -f /tmp/reload_sni_proxy
-    else
-      echo "[WARN] sniproxy crashed with exit code $?. Restarting..." >&2
-    fi
-    sleep 1
-done) &
+
+echo "[INFO] Starting nginx.."
+nginx
+
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
 wait -n
