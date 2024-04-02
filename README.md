@@ -3,6 +3,9 @@
 # SniDust
 SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
 
+# Update v1.0.10 - BREAKING CHANGE !!
+Please note replacing sniproxy with nginx resulted in a **breaking change**. nginx is listening on port **8080** (before 80) and **8443** (before 443). Ensure you update your docker configuration accordingly!
+
 ## Supported Services
 
 - Zattoo
