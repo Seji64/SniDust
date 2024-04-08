@@ -11,5 +11,5 @@ services:
             - '80:8080'
             - '53:5300/udp'
             - '53:5300/tcp'
-        image: 'Seji64/snidust:dev'
+        image: 'ghcr.io/seji64/snidust:main'
         restart: unless-stopped
