@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+    seji64:
+        container_name: sniDust
+        environment:
+            - 'ALLOWED_CLIENTS=127.0.0.1/32, myDynDNSDomain.no-ip.com' # CHANGE THIS
+            - 'EXTERNAL_IP=10.111.123.8' # CHANGE THIS TO YOUR VPS PUBLIC IP
+            - INSTALL_DEFAULT_DOMAINS=false
+        ports:
+            - '443:8443'
+            - '80:8080'
+            - '53:5300/udp'
+            - '53:5300/tcp'
+        image: 'Seji64/snidust:dev'
+        restart: unless-stopped
