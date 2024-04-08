@@ -22,6 +22,12 @@ then
   echo "[INFO] Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
 fi
 
+if [ "$INSTALL_DEFAULT_DOMAINS" = true ];
+then
+  echo "[INFO] Installing default domains..."
+  cp -v /var/lib/snidust/domains.d/*.lst /etc/snidust/domains.d/
+fi
+
 echo "[INFO] Generating ACL..."
 set +e
 source generateACL.sh

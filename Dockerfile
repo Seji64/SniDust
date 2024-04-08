@@ -18,6 +18,7 @@ ENV DNSDIST_RATE_LIMIT_BLOCK_DURATION=360
 ENV DNSDIST_RATE_LIMIT_EVAL_WINDOW=60
 ENV SPOOF_ALL_DOMAINS=false
 ENV DNYDNS_CRON_SCHEDULE="*/15 * * * *"
+ENV INSTALL_DEFAULT_DOMAINS=true
 
 # HEALTHCHECKS
 HEALTHCHECK --interval=30s --timeout=3s CMD (pgrep "dnsdist" > /dev/null && pgrep "nginx" > /dev/null) || exit 1
@@ -41,20 +42,19 @@ RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates opens
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d && \
-    mkdir -p /etc/snidust/ && \
-    mkdir -p /etc/sniproxy/
+    mkdir -p /etc/snidust/domains.d && \
+    mkdir -p /etc/sniproxy/ && \
+    mkdir -p /var/lib/snidust/domains.d
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
 COPY configs/dnsdist/conf.d/00-SniDust.conf /etc/dnsdist/conf.d/00-SniDust.conf
 COPY configs/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY domains.d /etc/snidust/domains.d
+COPY domains.d /var/lib/snidust/domains.d
 
 COPY entrypoint.sh /entrypoint.sh
 COPY generateACL.sh /generateACL.sh
 COPY dynDNSCron.sh /dynDNSCron.sh
-
-
 
 RUN chown -R snidust:snidust /etc/dnsdist/ && \
     chown -R snidust:snidust /etc/nginx/ && \
