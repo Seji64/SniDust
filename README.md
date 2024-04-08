@@ -241,7 +241,7 @@ You should see in the logs (`docker logs snidust`) snidust has reloaded your dom
 Based on the following projects:
 
 - https://dnsdist.org/
-- https://github.com/mosajjal/sniproxy/
+- https://www.nginx.com
 - https://github.com/andykimpe/wilmaa-proxy
 - https://github.com/suuhm/unblock-proxy.sh
 - https://github.com/ab77/netflix-proxy
