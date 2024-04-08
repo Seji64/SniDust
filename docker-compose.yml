@@ -5,7 +5,7 @@ services:
         environment:
             - 'ALLOWED_CLIENTS=127.0.0.1/32, myDynDNSDomain.no-ip.com' # CHANGE THIS
             - 'EXTERNAL_IP=10.111.123.8' # CHANGE THIS TO YOUR VPS PUBLIC IP
-            - INSTALL_DEFAULT_DOMAINS=false
+            - TZ=Europe/Berlin
         ports:
             - '443:8443'
             - '80:8080'
