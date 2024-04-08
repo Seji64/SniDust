@@ -125,8 +125,8 @@ To use your own/custom upstream DNS Server you have to do the following:
 - Use the [DNSDist Documentation](https://dnsdist.org/reference/config.html#newServer) to create you own upstream pool.
   Example:
   ```
-  newServer("192.0.2.1", name="custom1", pool="customUpstream")
-  newServer("192.0.2.2", name="custom2", pool="customUpstream")
+  newServer({address="192.0.2.1", name="custom1", pool="customUpstream"})
+  newServer({address="192.0.2.2", name="custom2", pool="customUpstream"})
   ```
  - Ensure you have set a `pool` and it is **NOT** named `upstream` (this name is already used by sniDust itself)
  - Set Environment Variable `DNSDIST_UPSTREAM_POOL_NAME` to your pool name *(here: `customUpstream`)*
