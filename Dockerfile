@@ -38,7 +38,7 @@ RUN apk update && apk upgrade
 RUN addgroup snidust && adduser -D -H -G snidust snidust
 
 # Install needed packages and clean up
-RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap nginx nginx-mod-stream && rm -rf /var/cache/apk/*
+RUN apk add --no-cache tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap nginx nginx-mod-stream supercronic && rm -rf /var/cache/apk/*
 
 # Setup Folder(s)
 RUN mkdir -p /etc/dnsdist/conf.d && \
@@ -57,6 +57,7 @@ COPY generateACL.sh /generateACL.sh
 COPY dynDNSCron.sh /dynDNSCron.sh
 
 RUN chown -R snidust:snidust /etc/dnsdist/ && \
+    chown -R snidust:snidust /etc/snidust/ && \
     chown -R snidust:snidust /etc/nginx/ && \
     chown -R snidust:snidust /var/log/nginx/ && \
     chown -R snidust:snidust /var/lib/nginx/ && \

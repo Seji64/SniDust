@@ -51,9 +51,11 @@ services:
     snidust:
         container_name: snidust
         environment:
+            - TZ=Europe/Berlin
             - 'ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com'
             - 'EXTERNAL_IP=10.111.123.8'
             - SPOOF_ALL_DOMAINS=false # Set to true (case sensitive!) if you want to spoof ALL domains.
+            # - 'DNYDNS_CRON_SCHEDULE=*/1 * * * *' # Example for specifing a custom cron interval for dynDNS Update. Default is '*/15 * * * *'
         ports:
             - 443:8443
             - 80:8080

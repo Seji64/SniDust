@@ -40,8 +40,8 @@ echo "[INFO] Generating DNSDist Config..."
 if [ "$DYNDNS_CRON_ENABLED" = true ];
 then
   echo "[INFO] DynDNS Address in ALLOWED_CLIENTS detected => Enable cron job"
-  echo "$DNYDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/crontabs/snidust
-  crond -f &
+  echo "$DNYDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/snidust/dyndns.cron
+  supercronic /etc/snidust/dyndns.cron &
 fi
 
 echo "[INFO] Starting DNSDist..."
@@ -50,6 +50,11 @@ echo "[INFO] Starting DNSDist..."
 
 echo "[INFO] Starting nginx.."
 nginx
+nginx_processId=$!
 
-echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
-wait -n
+sleep 5
+
+echo "==================================================================="
+echo "[INFO] SniDust started => Using $EXTERNAL_IP - Point your DNS settings to this address"
+echo "==================================================================="
+wait $nginx_processId
