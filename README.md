@@ -96,7 +96,7 @@ In case Systemd is already using port 53 you can follow this [Guide](https://www
 
 ## Advanced setups
 
-## Disable installtion of repo default domains
+### Disable installtion of repo default domains
 
 If do not want use the default domain lists of this repo, you can disable this by setting the environment variable `INSTALL_DEFAULT_DOMAINS` to `false`.
 
