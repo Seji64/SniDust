@@ -245,3 +245,13 @@ Based on the following projects:
 - https://github.com/andykimpe/wilmaa-proxy
 - https://github.com/suuhm/unblock-proxy.sh
 - https://github.com/ab77/netflix-proxy
+
+## Star History
+
+<a href="https://star-history.com/#Seji64/SniDust&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Seji64/SniDust&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Seji64/SniDust&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Seji64/SniDust&type=Date" />
+ </picture>
+</a>
