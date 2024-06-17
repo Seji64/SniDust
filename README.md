@@ -1,7 +1,7 @@
 [![Docker](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml)
 
 # SniDust
-SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
+SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and nginx
 
 # Update v1.0.10 - BREAKING CHANGE !!
 Please note replacing sniproxy with nginx resulted in a **breaking change**. nginx is listening on port **8080** (before 80) and **8443** (before 443). Ensure you update your docker configuration accordingly!
@@ -60,7 +60,7 @@ services:
             - 443:8443
             - 80:8080
             - 53:5300/udp
-        image: 'ghcr.io/seji64/snidust:main'
+        image: 'ghcr.io/seji64/snidust:1.0.13'
 ```
 
 ### Check logs of the container
@@ -164,7 +164,7 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
-        image: 'ghcr.io/seji64/snidust:main'
+        image: 'ghcr.io/seji64/snidust:1.0.13'
 ```
 
 ### Spoof all domains
@@ -202,7 +202,7 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/myacls.acl:/tmp/myacls.acl:ro'
-        image: 'ghcr.io/seji64/snidust:main'
+        image: 'ghcr.io/seji64/snidust:1.0.13'
 ```
 
 Then you can reload your ACLs by querying a specific DNS name:
