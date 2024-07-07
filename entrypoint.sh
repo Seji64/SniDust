@@ -40,7 +40,7 @@ echo "[INFO] Generating DNSDist Config..."
 if [ "$DYNDNS_CRON_ENABLED" = true ];
 then
   echo "[INFO] DynDNS Address in ALLOWED_CLIENTS detected => Enable cron job"
-  echo "$DNYDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/snidust/dyndns.cron
+  echo "$DYNDNS_CRON_SCHEDULE /bin/bash /dynDNSCron.sh" > /etc/snidust/dyndns.cron
   supercronic /etc/snidust/dyndns.cron &
 fi
 
