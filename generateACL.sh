@@ -3,7 +3,7 @@ CLIENTS=()
 export DYNDNS_CRON_ENABLED=false
 
 function read_acl () {
-  for i in "${array[@]}"
+  for i in "${client_list[@]}"
   do
     /usr/bin/ipcalc -cs "$i"
     retVal=$?
@@ -20,7 +20,7 @@ function read_acl () {
       fi
     fi
   done
-  (echo "${array[@]}" | grep -q '127.0.0.1')
+  (echo "${client_list[@]}" | grep -q '127.0.0.1')
   localipCheck=$?
   if [[ "$localipCheck" -eq 1 ]] && [[ "$DYNDNS_CRON_ENABLED" = true ]]; then
     echo "[INFO] Adding '127.0.0.1' to allowed clients cause else cron reload will not work"
@@ -32,12 +32,12 @@ if [ -n "${ALLOWED_CLIENTS_FILE}" ];
 then
   if [ -f "${ALLOWED_CLIENTS_FILE}" ];
   then
-    mapfile -t array < "$ALLOWED_CLIENTS_FILE"
+    mapfile -t client_list < "$ALLOWED_CLIENTS_FILE"
   else
     echo "[ERROR] ALLOWED_CLIENTS_FILE is set but file does not exists or is not accessible!"
   fi
 else
-  IFS=', ' read -ra array <<< "$ALLOWED_CLIENTS"
+  IFS=', ' read -ra client_list <<< "$ALLOWED_CLIENTS"
 fi
 
 read_acl
