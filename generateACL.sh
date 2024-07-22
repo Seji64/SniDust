@@ -10,7 +10,7 @@ function read_acl () {
     if [ $retVal -eq 0 ]; then
       CLIENTS+=( "${i}" )
     else
-      RESOLVE_RESULT=$(/usr/bin/dog --short --type A "${i}" | grep '^[.0-9]*$')
+      RESOLVE_RESULT=$(/usr/bin/dog --json "${i}" | jq -r '.responses[].answers[1].address')
       retVal=$?
       if [ $retVal -eq 0 ]; then
         export DYNDNS_CRON_ENABLED=true
