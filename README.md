@@ -60,7 +60,7 @@ services:
             - 443:8443
             - 80:8080
             - 53:5300/udp
-        image: 'ghcr.io/seji64/snidust:1.0.13'
+        image: 'ghcr.io/seji64/snidust:1.0.14'
 ```
 
 ### Check logs of the container
@@ -164,7 +164,7 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.13'
+        image: 'ghcr.io/seji64/snidust:1.0.14'
 ```
 
 ### Spoof all domains
@@ -202,7 +202,7 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/myacls.acl:/tmp/myacls.acl:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.13'
+        image: 'ghcr.io/seji64/snidust:1.0.14'
 ```
 
 Then you can reload your ACLs by querying a specific DNS name:
