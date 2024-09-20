@@ -9,7 +9,7 @@ if [ "${DNSDIST_ENABLE_DOT}" == "true" ]; then
   fi
 
   if [[ " ${VALID_CERT_TYPE_VALUES[*]} " =~ " ${DNSDIST_DOT_CERT_TYPE} " ]]; then
-    echo "[ERROR] The value of DNSDIST_DOT_CERT_TYPE is valid: $DNSDIST_DOT_CERT_TYPE"
+    echo "[INFO] The value of DNSDIST_DOT_CERT_TYPE is valid: $DNSDIST_DOT_CERT_TYPE"
   else
     echo "[ERROR] Invalid value for DNSDIST_DOT_CERT_TYPE: $DNSDIST_DOT_CERT_TYPE"
     exit 1

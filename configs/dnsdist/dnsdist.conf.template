@@ -21,7 +21,7 @@ echo "end"
 echo ""
 
 if [ "${DNSDIST_ENABLE_DOT}" == "true" ] && [ "${DNSDIST_DOT_CERT_TYPE}" == "auto-self" ]; then
-    echo "newTLSCertificate('/etc/dnsdist/certs/tls.pem', {key='/etc/dnsdist/certs/tls.key'})"
+    echo "tlsCert = newTLSCertificate('/etc/dnsdist/certs/tls.pem', {key='/etc/dnsdist/certs/tls.key'})"
 fi
 
 echo ""
@@ -30,7 +30,11 @@ echo "addLocal('${DNSDIST_BIND_IP}:5300')"
 echo ""
 if [ "${DNSDIST_ENABLE_DOT}" == "true" ]; then
     echo "-- Add DoT bind"
-    echo "addTLSLocal('${DNSDIST_BIND_IP}:8530','/etc/dnsdist/certs/tls.pem','/etc/dnsdist/certs/tls.key')"
+    if [ "${DNSDIST_DOT_CERT_TYPE}" == "auto-self" ]; then
+        echo "addTLSLocal('${DNSDIST_BIND_IP}:8530',tlsCert)"
+    else
+        echo "addTLSLocal('${DNSDIST_BIND_IP}:8530','/etc/dnsdist/certs/tls.pem','/etc/dnsdist/certs/tls.key')"
+    fi
 else
     echo "-- TLS Endpoints disabled"
 fi
