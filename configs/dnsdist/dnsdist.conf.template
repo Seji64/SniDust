@@ -24,9 +24,11 @@ echo ""
 echo "-- Add plain DNS bind"
 echo "addLocal('${DNSDIST_BIND_IP}:5300')"
 echo ""
+
 if [ "${DNSDIST_ENABLE_DOT}" == "true" ]; then
     echo "-- Add DoT bind"
     echo "addTLSLocal('${DNSDIST_BIND_IP}:8530','/etc/dnsdist/certs/tls.pem','/etc/dnsdist/certs/tls.key')"
+    echo ""
 else
     echo "-- TLS Endpoints disabled"
 fi
@@ -69,12 +71,12 @@ echo "-- query reload.domainlist.snidust.local to reload Blocklist"
 echo "addAction(AndRule({QNameRule(\"reload.domainlist.snidust.local\"),QTypeRule(\"A\")}),LuaAction(ReloadBlocklist))"
 echo ""
 
-echo "-- queryreload.acl.snidust.local to reload Blocklist"
+echo "-- query reload.acl.snidust.local to reload Blocklist"
 echo "addAction(AndRule({QNameRule(\"reload.acl.snidust.local\"),QTypeRule(\"A\")}),LuaAction(ReloadACL))"
 echo ""
 
-echo "-- queryreload.certs.snidust.local to reload certificates used for DoT"
-echo "addAction(AndRule({QNameRule(\"reload.certs.snidust.local\"),QTypeRule(\"A\")}),reloadAllCertificates())"
+echo "-- query reload.certs.snidust.local to reload certificates used for DoT"
+echo "addAction(AndRule({QNameRule(\"reload.certs.snidust.local\"),QTypeRule(\"A\")}),LuaAction(ReloadCerts))"
 echo ""
 
 if [ "${SPOOF_ALL_DOMAINS}" == "true" ]; then
