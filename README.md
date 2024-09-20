@@ -96,6 +96,10 @@ In case Systemd is already using port 53 you can follow this [Guide](https://www
 
 ## Advanced setups
 
+### DoT
+
+For examples how to use an setup DoT see `docker-compose.dot.yml` and `docker-compose.acme.sh-dot.yml`
+
 ### Disable installtion of repo default domains
 
 If do not want use the default domain lists of this repo, you can disable this by setting the environment variable `INSTALL_DEFAULT_DOMAINS` to `false`.

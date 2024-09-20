@@ -1,6 +1,5 @@
-version: '3.8'
 services:
-    seji64:
+    sniDust:
         container_name: sniDust
         environment:
             - 'ALLOWED_CLIENTS=127.0.0.1/32, myDynDNSDomain.no-ip.com' # CHANGE THIS
