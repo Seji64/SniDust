@@ -46,7 +46,7 @@ RUN apk update && apk upgrade
 RUN addgroup snidust && adduser -D -H -G snidust snidust
 
 # Install needed packages and clean up
-RUN apk add --no-cache jq tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap nginx nginx-mod-stream supercronic && \
+RUN apk add --no-cache jq tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap nginx nginx-mod-stream supercronic step-cli && \
     rm -f /etc/nginx/conf.d/*.conf && \
     rm -rf /var/cache/apk/*
 
