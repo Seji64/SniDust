@@ -6,7 +6,7 @@ services:
             - 'EXTERNAL_IP=10.111.123.8' # CHANGE THIS TO YOUR VPS PUBLIC IP
             - TZ=Europe/Berlin
             - DNSDIST_ENABLE_DOT=true
-            - DNSDIST_DOT_CERT_TYPE=auto-self # Generate selfsinged cert. Can also be set to 'manual'
+            - DNSDIST_DOT_CERT_TYPE=auto-self # Generate self-signed cert. Can also be set to 'manual'
         # Uncomment this if you choose manual. Align paths to match your environment -> Just an example!
         # volumes:
         #   - /etc/letsencrypt/live/dot.example.com/fullchain.pem:/etc/dnsdist/cert/tls.pem:ro
