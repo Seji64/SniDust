@@ -1,4 +1,23 @@
 #!/bin/bash -e
+
+# Validate DoT config
+if [ "${DNSDIST_ENABLE_DOT}" == "true" ]; then
+  VALID_CERT_TYPE_VALUES=("auto-self" "manual")
+  if [[ -z "$DNSDIST_DOT_CERT_TYPE" ]]; then
+    echo "The environment variable DNSDIST_DOT_CERT_TYPE is not set."
+    exit 1
+  fi
+
+  if [[ " ${VALID_CERT_TYPE_VALUES[*]} " =~ " ${DNSDIST_DOT_CERT_TYPE} " ]]; then
+    if [ "${DNSDIST_DOT_CERT_TYPE}" == "auto-self" ]; then
+      /usr/bin/step certificate create dot.snidust.local /etc/dnsdist/certs/tls.pem /etc/dnsdist/certs/tls.key --profile self-signed --subtle --no-password --insecure
+    fi
+  else
+    echo "[ERROR] Invalid value for DNSDIST_DOT_CERT_TYPE: $DNSDIST_DOT_CERT_TYPE"
+    exit 1
+  fi
+fi
+
 if [ -z "${EXTERNAL_IP}" ];
 then
   echo "[INFO] External IP not set - trying to get IP by myself"

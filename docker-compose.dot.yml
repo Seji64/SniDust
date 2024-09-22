@@ -1,0 +1,21 @@
+services:
+    sniDust:
+        container_name: sniDust
+        environment:
+            - 'ALLOWED_CLIENTS=127.0.0.1/32, myDynDNSDomain.no-ip.com' # CHANGE THIS
+            - 'EXTERNAL_IP=10.111.123.8' # CHANGE THIS TO YOUR VPS PUBLIC IP
+            - TZ=Europe/Berlin
+            - DNSDIST_ENABLE_DOT=true
+            - DNSDIST_DOT_CERT_TYPE=auto-self # Generate self-signed cert. Can also be set to 'manual'
+        # Uncomment this if you choose manual. Align paths to match your environment -> Just an example!
+        # volumes:
+        #   - /etc/letsencrypt/live/dot.example.com/fullchain.pem:/etc/dnsdist/cert/tls.pem:ro
+        #   - /etc/letsencrypt/live/dot.example.com/privkey.pem:/etc/dnsdist/cert/tls.key:ro
+        ports:
+            - '443:8443'
+            - '80:8080'
+            - '53:5300/udp'
+            - '53:5300/tcp'
+            - '853:8530/tcp'
+        image: 'ghcr.io/seji64/snidust:main'
+        restart: unless-stopped
