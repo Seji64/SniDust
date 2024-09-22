@@ -40,7 +40,7 @@ For this **example** lets assume your public ip (of your *server*) is `10.111.12
 ### Run SniDust on your Server
 
 ```
-docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" -e EXTERNAL_IP=10.111.123.8 -p 443:8443 -p 80:8080 -p 53:5300/udp ghcr.io/seji64/snidust:main
+docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" -e EXTERNAL_IP=10.111.123.8 -p 443:8443 -p 80:8080 -p 53:5300/udp ghcr.io/seji64/snidust:1.0.15
 ```
 
 Or if you use docker compose:
@@ -60,7 +60,7 @@ services:
             - 443:8443
             - 80:8080
             - 53:5300/udp
-        image: 'ghcr.io/seji64/snidust:1.0.14'
+        image: 'ghcr.io/seji64/snidust:1.0.15'
 ```
 
 ### Check logs of the container
@@ -168,7 +168,7 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.14'
+        image: 'ghcr.io/seji64/snidust:1.0.15'
 ```
 
 ### Spoof all domains
@@ -206,7 +206,7 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/myacls.acl:/tmp/myacls.acl:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.14'
+        image: 'ghcr.io/seji64/snidust:1.0.15'
 ```
 
 Then you can reload your ACLs by querying a specific DNS name:
