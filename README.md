@@ -188,6 +188,16 @@ services:
 ...
 ```
 
+### Reverse proxy on specified ports
+
+If you want to reverse proxy ports other than 80 and 443, customize the nginx.conf file.
+Note: You must also expose the ports with Docker.
+
+```yaml
+volumes:
+    '~/nginx.conf:/etc/nginx/nginx.conf:ro'
+```
+
 ### Reload allowed clients without container restart
 
 In case you want to have dynamic ALLOWED_CLIENTS ACL change your docker compose file to this:
