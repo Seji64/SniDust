@@ -43,7 +43,7 @@ echo ""
 
 if [ "${DNSDIST_ENABLE_WEBSERVER}" == "true" ]; then
     echo "-- Enable and configure Webserver"
-    echo "webserver(\"127.0.0.1:8083\")"
+    echo "webserver(\"0.0.0.0:8083\")"
     echo "setWebserverConfig({password=hashPassword(\"${DNSDIST_WEBSERVER_PASSWORD}\"), apiKey=hashPassword(\"${DNSDIST_WEBSERVER_API_KEY}\"), acl=\"${DNSDIST_WEBSERVER_NETWORKS_ACL}\"})"
     echo ""
 fi

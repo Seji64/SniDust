@@ -1,14 +1,18 @@
 services:
-    sniDust:
+    snidust:
+        build: .
         container_name: sniDust
         environment:
-            - 'ALLOWED_CLIENTS=127.0.0.1/32, myDynDNSDomain.no-ip.com' # CHANGE THIS
-            - 'EXTERNAL_IP=10.111.123.8' # CHANGE THIS TO YOUR VPS PUBLIC IP
-            - TZ=Europe/Berlin
+            - 'ALLOWED_CLIENTS_FILE=/tmp/myacls.acl'
+#            - 'ALLOWED_CLIENTS=0.0.0.0/0, appino.app' # CHANGE THIS
+            - 'DNSDIST_ENABLE_WEBSERVER=true'
+            - 'DNSDIST_WEBSERVER_NETWORKS_ACL=appinoapphome.ddns.net' # CHANGE THIS
         ports:
             - '443:8443'
             - '80:8080'
-            - '53:5300/udp'
-            - '53:5300/tcp'
-        image: 'ghcr.io/seji64/snidust:main'
+            - '81:8083'
+            - '63:5300/udp'
+            - '63:5300/tcp'
+        volumes:
+            - './myacls.acl:/tmp/myacls.acl:ro'
         restart: unless-stopped

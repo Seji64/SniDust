@@ -71,7 +71,7 @@ echo "[INFO] Starting nginx.."
 nginx
 nginx_processId=$!
 
-sleep 5
+sleep 200
 
 echo "==================================================================="
 echo "[INFO] SniDust started => Using $EXTERNAL_IP - Point your DNS settings to this address"
