@@ -81,7 +81,7 @@ echo "addAction(AndRule({QNameRule(\"reload.certs.snidust.local\"),QTypeRule(\"A
 echo ""
 
 echo "-- add packet cache"
-echo "pc = newPacketCache(100000)"
+echo "pc = newPacketCache(50000)"
 echo "getPool(\"\"):setCache(pc)"
 echo "pc:setMaxTTL(86400)"
 echo ""
