@@ -77,6 +77,7 @@ RUN chown -R snidust:snidust /etc/dnsdist/ && \
     chown -R snidust:snidust /var/lib/nginx/ && \
     chown -R snidust:snidust /run/nginx/ && \
     chown -R snidust:snidust /tmp/nginx_cache/ && \
+    setcap 'cap_net_admin+ep' /usr/sbin/unbound && \
     chmod +x /entrypoint.sh && \
     chmod +x /generateACL.sh && \
     chmod +x dynDNSCron.sh
