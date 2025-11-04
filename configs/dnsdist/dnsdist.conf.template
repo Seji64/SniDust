@@ -51,12 +51,13 @@ fi
 # Only add default Upstream pool if no custom is defined/configured
 if [ "${DNSDIST_UPSTREAM_POOL_NAME}" == "upstream" ]; then
 echo "-- add default upstream pool"
-echo "newServer({address=\"8.8.8.8:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
-echo "newServer({address=\"8.8.4.4:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+echo "newServer({address=\"127.0.0.1:5335\", name=\"unbound\", pool=\"upstream\"})"
+echo "newServer({address=\"8.8.8.8:853\", name=\"dns.google\", order=2, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+echo "newServer({address=\"8.8.4.4:853\", name=\"dns.google\", order=2, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
 echo "newServer({address=\"1.1.1.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
 echo "newServer({address=\"1.0.0.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
 echo ""
-echo "setPoolServerPolicy(roundrobin,\"upstream\")"
+echo "setPoolServerPolicy(leastOutstanding,\"upstream\")"
 echo ""
 fi
 

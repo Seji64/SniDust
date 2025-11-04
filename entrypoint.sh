@@ -56,6 +56,9 @@ set -e
 echo "[INFO] Generating DNSDist Config..."
 /bin/bash /etc/dnsdist/dnsdist.conf.template > /etc/dnsdist/dnsdist.conf
 
+echo "[INFO] Starting Unbound..."
+unbound -c /etc/unbound/unbound.conf &
+
 if [ "$DYNDNS_CRON_ENABLED" = true ];
 then
   echo "[INFO] DynDNS Address in ALLOWED_CLIENTS detected => Enable cron job"

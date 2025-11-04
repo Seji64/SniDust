@@ -46,7 +46,7 @@ RUN apk update && apk upgrade
 RUN addgroup snidust && adduser -D -H -G snidust snidust
 
 # Install needed packages and clean up
-RUN apk add --no-cache jq tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap nginx nginx-mod-stream supercronic step-cli && \
+RUN apk add --no-cache jq tini dnsdist curl bash gnupg procps ca-certificates openssl dog lua5.4-filesystem ipcalc libcap nginx nginx-mod-stream supercronic step-cli unbound && \
     rm -f /etc/nginx/conf.d/*.conf && \
     rm -rf /var/cache/apk/*
 
@@ -62,6 +62,7 @@ RUN mkdir -p /etc/dnsdist/conf.d && \
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
 COPY configs/dnsdist/conf.d/00-SniDust.conf /etc/dnsdist/conf.d/00-SniDust.conf
 COPY configs/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY configs/unbound/unbound.conf /etc/unbound/unbound.conf
 COPY domains.d /var/lib/snidust/domains.d
 
 COPY entrypoint.sh /entrypoint.sh
@@ -71,6 +72,7 @@ COPY dynDNSCron.sh /dynDNSCron.sh
 RUN chown -R snidust:snidust /etc/dnsdist/ && \
     chown -R snidust:snidust /etc/snidust/ && \
     chown -R snidust:snidust /etc/nginx/ && \
+    chown -R snidust:snidust /etc/unbound/ && \
     chown -R snidust:snidust /var/log/nginx/ && \
     chown -R snidust:snidust /var/lib/nginx/ && \
     chown -R snidust:snidust /run/nginx/ && \
