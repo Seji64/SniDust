@@ -55,7 +55,8 @@ RUN mkdir -p /etc/dnsdist/conf.d && \
     mkdir -p /etc/dnsdist/certs && \
     mkdir -p /etc/snidust/domains.d && \
     mkdir -p /etc/sniproxy/ && \
-    mkdir -p /var/lib/snidust/domains.d
+    mkdir -p /var/lib/snidust/domains.d && \
+    mkdir -p /tmp/nginx_cache/
 
 # Copy Files
 COPY configs/dnsdist/dnsdist.conf.template /etc/dnsdist/dnsdist.conf.template
@@ -73,6 +74,7 @@ RUN chown -R snidust:snidust /etc/dnsdist/ && \
     chown -R snidust:snidust /var/log/nginx/ && \
     chown -R snidust:snidust /var/lib/nginx/ && \
     chown -R snidust:snidust /run/nginx/ && \
+    chown -R snidust:snidust /tmp/nginx_cache/ && \
     chmod +x /entrypoint.sh && \
     chmod +x /generateACL.sh && \
     chmod +x dynDNSCron.sh

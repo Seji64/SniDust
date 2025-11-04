@@ -79,6 +79,12 @@ echo "-- query reload.certs.snidust.local to reload certificates used for DoT"
 echo "addAction(AndRule({QNameRule(\"reload.certs.snidust.local\"),QTypeRule(\"A\")}),LuaAction(ReloadCerts))"
 echo ""
 
+echo "-- add packet cache"
+echo "pc = newPacketCache(100000)"
+echo "getPool(\"\"):setCache(pc)"
+echo "pc:setMaxTTL(86400)"
+echo ""
+
 if [ "${SPOOF_ALL_DOMAINS}" == "true" ]; then
     echo " -- rewrite it for ALL Domains"
     echo "addAction(AllRule(), SpoofAction(\"${EXTERNAL_IP}\"))"
