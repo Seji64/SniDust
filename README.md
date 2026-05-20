@@ -3,8 +3,6 @@
 # SniDust
 SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and nginx
 
-# Update v1.0.10 - BREAKING CHANGE !!
-Please note replacing sniproxy with nginx resulted in a **breaking change**. nginx is listening on port **8080** (before 80) and **8443** (before 443). Ensure you update your docker configuration accordingly!
 
 ## Supported Services
 
@@ -23,7 +21,7 @@ You will need a VPS or a Root Server where you can install [Docker](https://www.
 
 ### Get your Public IP (Client)
 
-```
+```bash
 ## run this in your terminal or use your webbrowser
 curl https://ifconfig.co
 ```
@@ -32,14 +30,14 @@ Since version `v1.0.8` you can also use DynDNS. In this case just use your DynDN
 
 ### Get your IP of your Server
 
-```
+```bash
 curl https://ifconfig.co
 ```
 For this **example** lets assume your public ip (of your *server*) is `10.111.123.8`
 
 ### Run SniDust on your Server
 
-```
+```bash
 docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" -e EXTERNAL_IP=10.111.123.8 -p 443:8443 -p 80:8080 -p 53:5300/udp ghcr.io/seji64/snidust:1.0.15
 ```
 
@@ -70,7 +68,7 @@ docker logs snidust
 
 The logs should look something like this:
 
-```
+```bash
 ...
 Webserver launched on 127.0.0.1:8083
 Marking downstream 1.0.0.1:443 as 'up'
@@ -111,7 +109,8 @@ Generate a warning if we detect a query rate above 800 qps *(Query per second)* 
 If the query rate rises above 1000 qps for 60 seconds, we'll block the client for 360s.
 ```
 To customize this behavior you can use the following environment variables:
-````
+
+````yaml
 DNSDIST_RATE_LIMIT_WARN (default: 800)
 DNSDIST_RATE_LIMIT_BLOCK (default: 1000)
 DNSDIST_RATE_LIMIT_BLOCK_DURATION (default: 360)
@@ -168,13 +167,43 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.15'
+        image: 'ghcr.io/seji64/snidust:1.0.16'
+```
+
+### Packet Caching
+
+To improve performance and reduce latency, you can enable packet caching using environment variables. This allows SniDust to cache DNS responses locally.
+
+Use the following environment variables to configure the cache:
+
+| Variable | Description |
+| :--- | :--- |
+| `DNSDIST_PACKAGE_CACHE_ENABLED` | If true, packetcache is enabled. |
+| `DNSDIST_PACKAGE_CACHE_SIZE` |  Sets the maximum size of the packet cache (number of entries). |
+
+#### Example usage in docker-compose:
+
+```yaml
+version: '3.3'
+services:
+    snidust:
+        container_name: snidust
+        environment:
+            - EXTERNAL_IP=10.111.123.8
+            - DNSDIST_PACKAGE_CACHE_ENABLED=true
+            - DNSDIST_PACKAGE_CACHE_SIZE=5000
+        ports:
+            - '443:8443'
+            - '80:8080'
+            - '53:5300/udp'
+        image: 'ghcr.io/seji64/snidust:1.0.16'
 ```
 
 ### Spoof all domains
 
 If you don't want to maintain a list of domains and you just want to spoof everything set `SPOOF_ALL_DOMAINS` to `true`
-**WARNING:**: As a result, the COMPLETE traffic runs through your VPS - this is not the optimal use of SniDust. Only the traffic needed to cloak the GeoLocation should flow through SniDust
+
+**WARNING:** As a result, the **COMPLETE** traffic runs through your VPS - this is not the optimal use of SniDust. Only the traffic needed to cloak the GeoLocation should flow through SniDust
 
 ```yaml
 version: '3.3'
@@ -206,11 +235,12 @@ services:
             - '53:5300/udp'
         volumes:
             - '~/myacls.acl:/tmp/myacls.acl:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.15'
+        image: 'ghcr.io/seji64/snidust:1.0.16'
 ```
 
 Then you can reload your ACLs by querying a specific DNS name:
-```
+
+```bash
 # Assuming 10.11.123.8 is the IP of your Server where snidust runs
 dig @10.111.123.8 reload.acl.snidust.local
 ```
@@ -227,18 +257,43 @@ You should see in the logs (`docker logs snidust`) snidust has reloaded your ACL
 
 In case you added custom domains like the above, update the `99-custom.lst` file but don't want to restart your SniDust container each time, you can reload all domains with a custom DNS question.
 
-```
+```bash
 # Assuming 10.11.123.8 is the IP of your Server where snidust runs
 dig @10.111.123.8 reload.domainlist.snidust.local
 ```
 
 You should see in the logs (`docker logs snidust`) snidust has reloaded your domain
 
-```
+```bash
 [SniDust] Reloading domain lists...
 ...
 [SniDust] *** End of Domain List ***
 [SniDust] Domain Lists reloaded!
+```
+
+
+### Custom Nginx Configuration & Reverse Proxying
+
+If you need to use a custom `nginx.conf` for performance tuning, or if you want to use Nginx to reverse proxy additional services (e.g., a web dashboard on port 5000), you can mount your own configuration file.
+
+#### Using a custom config
+Mount your local `nginx.conf` to `/etc/nginx/nginx.conf` within the container.
+
+```yaml
+version: '3.3'
+services:
+    snidust:
+        container_name: snidust
+        environment:
+            - EXTERNAL_IP=10.111.123.8
+        ports:
+            - '443:8443'
+            - '80:8080'
+            - '53:5300/udp'
+            - '5000:5000' # Example: exposing an additional service
+        volumes:
+            - '~/nginx.conf:/etc/nginx/nginx.conf:ro'
+        image: 'ghcr.io/seji64/snidust:1.0.16'
 ```
 
 ## Credits
