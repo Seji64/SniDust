@@ -3,6 +3,7 @@ echo ""
 echo "-- Disable security status polling via DNS"
 echo "setSecurityPollSuffix(\"\")"
 echo ""
+
 echo "-- LUA"
 if [ "${DNSDIST_RATE_LIMIT_DISABLE}" == "false" ]; then
     echo "dbrRateLimit = dynBlockRulesGroup()"
@@ -50,18 +51,24 @@ fi
 
 # Only add default Upstream pool if no custom is defined/configured
 if [ "${DNSDIST_UPSTREAM_POOL_NAME}" == "upstream" ]; then
-echo "-- add default upstream pool"
-echo "newServer({address=\"8.8.8.8:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
-echo "newServer({address=\"8.8.4.4:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
-echo "newServer({address=\"1.1.1.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
-echo "newServer({address=\"1.0.0.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
-echo ""
-echo "setPoolServerPolicy(roundrobin,\"upstream\")"
-echo ""
+    echo "-- add default upstream pool"
+    echo "newServer({address=\"8.8.8.8:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+    echo "newServer({address=\"8.8.4.4:853\", name=\"dns.google\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"dns.google\", validateCertificates=true, mustResolve=true, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+    echo "newServer({address=\"1.1.1.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+    echo "newServer({address=\"1.0.0.1:443\", name=\"cloudflare-dns\", order=1, pool=\"upstream\", reconnectOnUp=true, maxCheckFailures=3, rise=3, tls=\"openssl\", subjectName=\"cloudflare-dns.com\", dohPath=\"/dns-query\", validateCertificates=true, mustResolve=false, checkInterval=${DNSDIST_UPSTREAM_CHECK_INTERVAL}, checkTimeout=2000})"
+    echo ""
+    echo "setPoolServerPolicy(leastOutstanding,\"upstream\")"
+    echo ""
+fi
+
+if [ "${DNSDIST_PACKAGE_CACHE_ENABLED}" == "true" ]; then
+    echo "-- Package Cache"
+    echo "pc = newPacketCache(\"${DNSDIST_PACKAGE_CACHE_SIZE}\", {maxTTL=86400, minTTL=0, temporaryFailureTTL=5, staleTTL=10, dontAge=false, shuffle=false})"
+    echo "getPool(\"${DNSDIST_UPSTREAM_POOL_NAME}\"):setCache(pc)"
+    echo ""
 fi
 
 if [ "${DNSDIST_DEBUG}" == "true" ]; then
-
     echo "-- Debug logging rule"
     echo "addAction(AllRule(), LogAction(\"/tmp/dnsdist.log\", false, true, false))"
     echo ""
