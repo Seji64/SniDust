@@ -1,312 +1,169 @@
 [![Docker](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml)
 
 # SniDust
-SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and nginx
-
+**SmartDNS Proxy to hide your GeoLocation.** 
+SniDust is a powerful tool based on **DnsDist** and **Nginx**, designed to proxy DNS requests and spoof your origin IP to bypass geo-restrictions for various services.
 
 ## Supported Services
-
+SniDust is optimized for services such as:
 - Zattoo
 - Yallo.tv
 - Netflix
 - Hulu
 - Amazon Prime
-- SRF.ch (live tv)
+- SRF.ch (Live TV)
 
 ## Prerequisites
+You will need a VPS or a Root Server with [Docker](https://www.docker.com/) installed.
 
-You will need a VPS or a Root Server where you can install [Docker](https://www.docker.com/) (or Docker is already installed).
+## Usage
 
-##  Usage
-
-### Get your Public IP (Client)
-
-```bash
-## run this in your terminal or use your webbrowser
-curl https://ifconfig.co
-```
-For this **example**  lets assume your public ip (of your *client*) is `10.111.123.7`
-Since version `v1.0.8` you can also use DynDNS. In this case just use your DynDNS domain eg. `myDynDNSDomain.no-ip.com`
-
-### Get your IP of your Server
-
+### 1. Determine Your Client Public IP
+Run this on the device you will be using to connect to the proxy:
 ```bash
 curl https://ifconfig.co
 ```
-For this **example** lets assume your public ip (of your *server*) is `10.111.123.8`
+*Example: Let's assume your client public IP is `10.111.123.7` or you use a DynDNS domain like `myDynDNSDomain.no-ip.com`.*
 
-### Run SniDust on your Server
-
+### 2. Determine Your Server Public IP
+Run this on the server where SniDust will be hosted:
 ```bash
-docker run -d --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" -e EXTERNAL_IP=10.111.123.8 -p 443:8443 -p 80:8080 -p 53:5300/udp ghcr.io/seji64/snidust:1.0.15
+curl https://ifconfig.co
+```
+*Example: Let's assume your server public IP is `10.111.123.8`.*
+
+### 3. Deploy SniDust
+
+#### Using Docker Run
+```bash
+docker run -d \
+  --name snidust \
+  -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" \
+  -e EXTERNAL_IP=10.111.123.8 \
+  -p 443:8443 -p 80:8080 -p 53:5300/udp \
+  ghcr.io/seji64/snidust:latest
 ```
 
-Or if you use docker compose:
-
+#### Using Docker Compose
 ```yaml
 version: '3.3'
 services:
     snidust:
         container_name: snidust
+        image: 'ghcr.io/seji64/snidust:latest'
         environment:
             - TZ=Europe/Berlin
             - 'ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com'
             - 'EXTERNAL_IP=10.111.123.8'
-            - SPOOF_ALL_DOMAINS=false # Set to true (case sensitive!) if you want to spoof ALL domains.
-            # - 'DYNDNS_CRON_SCHEDULE=*/1 * * * *' # Example for specifing a custom cron interval for dynDNS Update. Default is '*/15 * * * *'
+            - SPOOF_ALL_DOMAINS=false # Set to true to spoof ALL domains (not recommended)
+            # - 'DYNDNS_CRON_SCHEDULE=*/1 * * * *' # Custom cron interval for DynDNS. Default: '*/15 * * * *'
         ports:
             - 443:8443
             - 80:8080
             - 53:5300/udp
-        image: 'ghcr.io/seji64/snidust:1.0.15'
 ```
 
-### Check logs of the container
+### 4. Verification
+Check the container logs to ensure everything is running correctly:
 ```bash
 docker logs snidust
 ```
+You should see messages indicating that the webserver is launched and the upstream DNS servers (Google, Cloudflare) are marked as 'up'.
 
-The logs should look something like this:
+### 5. Client Configuration
+Change the DNS server settings on your client device to the **Public IP of your server** (`10.111.123.8`). Your GeoLocation is now hidden!
 
+---
+
+## Configuration & Environment Variables
+
+### Core Settings
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `ALLOWED_CLIENTS` | `127.0.0.1` | Comma-separated list of allowed IPs or DynDNS domains. |
+| `ALLOWED_CLIENTS_FILE` | *(empty)* | Path to a file containing the ACL (allows reloading without restart). |
+| `EXTERNAL_IP` | *(empty)* | The public IP of the server to be used for spoofing. |
+| `SPOOF_ALL_DOMAINS` | `false` | If `true`, all DNS queries are spoofed regardless of the domain list. |
+| `INSTALL_DEFAULT_DOMAINS` | `true` | Whether to install the default domain lists provided by the repo. |
+| `DYNDNS_CRON_SCHEDULE` | `*/15 * * * *` | Schedule for DynDNS updates. |
+
+### DNSDist Performance & Security
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `DNSDIST_RATE_LIMIT_DISABLE` | `false` | Set to `true` to disable rate limiting. |
+| `DNSDIST_RATE_LIMIT_WARN` | `800` | Warning threshold in queries per second (qps). |
+| `DNSDIST_RATE_LIMIT_BLOCK` | `1000` | Blocking threshold in qps. |
+| `DNSDIST_RATE_LIMIT_BLOCK_DURATION` | `360` | Duration (seconds) for which a client is blocked. |
+| `DNSDIST_RATE_LIMIT_EVAL_WINDOW` | `60` | Evaluation window in seconds. |
+| `DNSDIST_PACKAGE_CACHE_ENABLED` | `false` | Enables packet caching to reduce latency. |
+| `DNSDIST_PACKAGE_CACHE_SIZE` | `50000` | Maximum number of entries in the packet cache. |
+| `DNSDIST_UPSTREAM_POOL_NAME` | `upstream` | Name of the upstream pool. Change this if using a custom pool. |
+| `DNSDIST_UPSTREAM_CHECK_INTERVAL` | `10` | Interval (seconds) for checking upstream server health. |
+
+---
+
+## Advanced Setups
+
+### DNS over TLS (DoT)
+For examples on how to set up DoT, refer to `docker-compose.dot.yml` and `docker-compose.acme.sh-dot.yml` in the repository.
+
+### Custom Upstream DNS Servers
+To use your own upstream DNS servers instead of the defaults (Google/Cloudflare):
+1. Create a file named `99-customUpstream.conf`.
+2. Define your servers using the [DNSDist configuration syntax](https://dnsdist.org/reference/config.html#newServer).
+   *Example:*
+   ```
+   newServer({address="192.0.2.1", name="custom1", pool="customUpstream"})
+   newServer({address="192.0.2.2", name="custom2", pool="customUpstream"})
+   ```
+3. Set the environment variable `DNSDIST_UPSTREAM_POOL_NAME` to your pool name (e.g., `customUpstream`).
+4. Mount the file into the container:
+   ```yaml
+   volumes:
+     - ~/99-customUpstream.conf:/etc/dnsdist/conf.d/99-customUpstream.conf
+   ```
+
+### Custom Domain Lists
+To add domains not included by default, create a file named `99-custom.lst` and mount it:
 ```bash
-...
-Webserver launched on 127.0.0.1:8083
-Marking downstream 1.0.0.1:443 as 'up'
-Marking downstream dns.google (8.8.8.8:853) as 'up'
-Marking downstream dns.google (8.8.4.4:853) as 'up'
-Marking downstream 1.1.1.1:443 as 'up'
-Polled security status of version 1.7.1 at startup, no known issues reported: OK
+docker run --name snidust \
+  -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" \
+  -e EXTERNAL_IP=10.111.123.8 \
+  -p 443:8443 -p 80:8080 -p 53:5300/udp \
+  -v ~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro \
+  ghcr.io/seji64/snidust:latest
 ```
 
-### Configure your client
+### Dynamic Reloading
+You can reload configurations without restarting the container by sending a specific DNS query:
 
-Change your network settings and set the DNS Server as  10.111.123.8 (**PUBLIC_VPS_IP**)
+- **Reload ACLs:** `dig @<SERVER_IP> reload.acl.snidust.local`
+- **Reload Domain Lists:** `dig @<SERVER_IP> reload.domainlist.snidust.local`
 
-Your GeoLaction should now hidden :-)
+### Custom Nginx Configuration
+If you need a custom `nginx.conf` for reverse proxying or performance tuning, mount it to `/etc/nginx/nginx.conf`:
+```yaml
+volumes:
+  - '~/nginx.conf:/etc/nginx/nginx.conf:ro'
+```
+
+---
 
 ## Troubleshooting
 
-### Error Port 53 is already in use
-
-In this case, you are either running another service (like Pi-Hole) that already uses this Port or you likely use a Linux distribution that uses Systemd.
-
-In case Systemd is already using port 53 you can follow this [Guide](https://www.linuxuprising.com/2020/07/ubuntu-how-to-free-up-port-53-used-by.html) to free up this port.
-
-## Advanced setups
-
-### DoT
-
-For examples how to use an setup DoT see `docker-compose.dot.yml` and `docker-compose.acme.sh-dot.yml`
-
-### Disable installtion of repo default domains
-
-If do not want use the default domain lists of this repo, you can disable this by setting the environment variable `INSTALL_DEFAULT_DOMAINS` to `false`.
-
-### Configure DNS Rate Limiting
-The default is the following:
-```
-Generate a warning if we detect a query rate above 800 qps *(Query per second)* for at least 60s.
-If the query rate rises above 1000 qps for 60 seconds, we'll block the client for 360s.
-```
-To customize this behavior you can use the following environment variables:
-
-````yaml
-DNSDIST_RATE_LIMIT_WARN (default: 800)
-DNSDIST_RATE_LIMIT_BLOCK (default: 1000)
-DNSDIST_RATE_LIMIT_BLOCK_DURATION (default: 360)
-DNSDIST_RATE_LIMIT_EVAL_WINDOW (default: 60)
-````
-
-If you want to disable Rate Limiting completely set `DNSDIST_RATE_LIMIT_DISABLE` to `true`
-
-### Use custom Upstream DNS Servers
-By default, SniDust is using Cloudflare's and Google's DNS Servers as Upstream.
-To use your own/custom upstream DNS Server you have to do the following:
-
-#### Configure and use Custom Upstream Pool
-- Create a file named 99-customUpstream.conf
-- Use the [DNSDist Documentation](https://dnsdist.org/reference/config.html#newServer) to create you own upstream pool.
-  Example:
-  ```
-  newServer({address="192.0.2.1", name="custom1", pool="customUpstream"})
-  newServer({address="192.0.2.2", name="custom2", pool="customUpstream"})
-  ```
- - Ensure you have set a `pool` and it is **NOT** named `upstream` (this name is already used by sniDust itself)
- - Set Environment Variable `DNSDIST_UPSTREAM_POOL_NAME` to your pool name *(here: `customUpstream`)*
- - Map your file `99-customUpstream.conf`
-   ```
-   ...
-           volumes:
-             - ~/99-customUpstream.conf:/etc/dnsdist/conf.d/99-customUpstream.conf
-    ...
-   ```
-### Add custom domains
-
-In case you want to add custom domains which not included by default, this can be done easily.
-Create a file with the name `99-custom.lst`. Insert all your custom domains in this file.
-
-#### Mount it
-
-```bash
-docker run --name snidust -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7" -e EXTERNAL_IP=10.111.123.8 -p 443:8443 -p 80:8080 -p 53:5300/udp -v ~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro ghcr.io/seji64/snidust:main
-```
-
-Or if you use docker-compose:
-
-```yaml
-version: '3.3'
-services:
-    snidust:
-        container_name: snidust
-        environment:
-            - 'ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7'
-            - EXTERNAL_IP=10.111.123.8
-        ports:
-            - '443:8443'
-            - '80:8080'
-            - '53:5300/udp'
-        volumes:
-            - '~/99-custom.lst:/etc/snidust/domains.d/99-custom.lst:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.16'
-```
-
-### Packet Caching
-
-To improve performance and reduce latency, you can enable packet caching using environment variables. This allows SniDust to cache DNS responses locally.
-
-Use the following environment variables to configure the cache:
-
-| Variable | Description |
-| :--- | :--- |
-| `DNSDIST_PACKAGE_CACHE_ENABLED` | If true, packetcache is enabled. |
-| `DNSDIST_PACKAGE_CACHE_SIZE` |  Sets the maximum size of the packet cache (number of entries). |
-
-#### Example usage in docker-compose:
-
-```yaml
-version: '3.3'
-services:
-    snidust:
-        container_name: snidust
-        environment:
-            - EXTERNAL_IP=10.111.123.8
-            - DNSDIST_PACKAGE_CACHE_ENABLED=true
-            - DNSDIST_PACKAGE_CACHE_SIZE=5000
-        ports:
-            - '443:8443'
-            - '80:8080'
-            - '53:5300/udp'
-        image: 'ghcr.io/seji64/snidust:1.0.16'
-```
-
-### Spoof all domains
-
-If you don't want to maintain a list of domains and you just want to spoof everything set `SPOOF_ALL_DOMAINS` to `true`
-
-**WARNING:** As a result, the **COMPLETE** traffic runs through your VPS - this is not the optimal use of SniDust. Only the traffic needed to cloak the GeoLocation should flow through SniDust
-
-```yaml
-version: '3.3'
-services:
-    snidust:
-        container_name: snidust
-        environment:
-            - 'ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7'
-            - EXTERNAL_IP=10.111.123.8
-            - SPOOF_ALL_DOMAINS=true
-...
-```
-
-### Reload allowed clients without container restart
-
-In case you want to have dynamic ALLOWED_CLIENTS ACL change your docker compose file to this:
-
-```yaml
-version: '3.3'
-services:
-    snidust:
-        container_name: snidust
-        environment:
-            - 'ALLOWED_CLIENTS_FILE=/tmp/myacls.acl'
-            - EXTERNAL_IP=10.111.123.8
-        ports:
-            - '443:8443'
-            - '80:8080'
-            - '53:5300/udp'
-        volumes:
-            - '~/myacls.acl:/tmp/myacls.acl:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.16'
-```
-
-Then you can reload your ACLs by querying a specific DNS name:
-
-```bash
-# Assuming 10.11.123.8 is the IP of your Server where snidust runs
-dig @10.111.123.8 reload.acl.snidust.local
-```
-
-You should see in the logs (`docker logs snidust`) snidust has reloaded your ACLs
-
-```
-[SniDust] *** Reloading ACL... ***
-...
-[SniDust] *** ACL reload complete! ***
-```
-
-### Reload Domains without container restart
-
-In case you added custom domains like the above, update the `99-custom.lst` file but don't want to restart your SniDust container each time, you can reload all domains with a custom DNS question.
-
-```bash
-# Assuming 10.11.123.8 is the IP of your Server where snidust runs
-dig @10.111.123.8 reload.domainlist.snidust.local
-```
-
-You should see in the logs (`docker logs snidust`) snidust has reloaded your domain
-
-```bash
-[SniDust] Reloading domain lists...
-...
-[SniDust] *** End of Domain List ***
-[SniDust] Domain Lists reloaded!
-```
-
-
-### Custom Nginx Configuration & Reverse Proxying
-
-If you need to use a custom `nginx.conf` for performance tuning, or if you want to use Nginx to reverse proxy additional services (e.g., a web dashboard on port 5000), you can mount your own configuration file.
-
-#### Using a custom config
-Mount your local `nginx.conf` to `/etc/nginx/nginx.conf` within the container.
-
-```yaml
-version: '3.3'
-services:
-    snidust:
-        container_name: snidust
-        environment:
-            - EXTERNAL_IP=10.111.123.8
-        ports:
-            - '443:8443'
-            - '80:8080'
-            - '53:5300/udp'
-            - '5000:5000' # Example: exposing an additional service
-        volumes:
-            - '~/nginx.conf:/etc/nginx/nginx.conf:ro'
-        image: 'ghcr.io/seji64/snidust:1.0.16'
-```
+### Port 53 is already in use
+If you encounter an error stating that port 53 is occupied, it is likely due to another service (like Pi-hole) or `systemd-resolved` on Linux.
+Follow this [Guide](https://www.linuxuprising.com/2020/07/ubuntu-how-to-free-up-port-53-used-by.html) to free up the port.
 
 ## Credits
 Based on the following projects:
-
-- https://dnsdist.org/
-- https://www.nginx.com
-- https://github.com/andykimpe/wilmaa-proxy
-- https://github.com/suuhm/unblock-proxy.sh
-- https://github.com/ab77/netflix-proxy
+- [dnsdist.org](https://dnsdist.org/)
+- [nginx.org](https://www.nginx.com)
+- [wilmaa-proxy](https://github.com/andykimpe/wilmaa-proxy)
+- [unblock-proxy.sh](https://github.com/suuhm/unblock-proxy.sh)
+- [netflix-proxy](https://github.com/ab77/netflix-proxy)
 
 ## Star History
-
 <a href="https://star-history.com/#Seji64/SniDust&Date">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Seji64/SniDust&type=Date&theme=dark" />
