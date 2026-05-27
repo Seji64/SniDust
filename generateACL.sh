@@ -5,7 +5,7 @@ export DYNDNS_CRON_ENABLED=false
 function read_acl () {
   for i in "${client_list[@]}"
   do
-    /usr/bin/ipcalc -cs "$i"
+    /bin/ipcalc -cs "$i"
     retVal=$?
     if [ $retVal -eq 0 ]; then
       CLIENTS+=( "${i}" )
