@@ -99,6 +99,8 @@ Change the DNS server settings on your client device to the **Public IP of your 
 | `DNSDIST_PACKAGE_CACHE_SIZE` | `50000` | Maximum number of entries in the packet cache. |
 | `DNSDIST_UPSTREAM_POOL_NAME` | `upstream` | Name of the upstream pool. Change this if using a custom pool. |
 | `DNSDIST_UPSTREAM_CHECK_INTERVAL` | `10` | Interval (seconds) for checking upstream server health. |
+| `DNSDIST_ENABLE_WEBSERVER` | `false` | If `true`, enables the DnsDist webserver on `127.0.0.1:8083`. Add `-p 8083:8083` to reach it; the password and API key are generated automatically if not set. |
+| `DNSDIST_DEBUG` | `false` | If `true`, logs every DNS query to `/tmp/dnsdist.log`. |
 
 ---
 
