@@ -1,4 +1,4 @@
-##!/bin/bash
+#!/bin/bash
 CLIENTS=()
 export DYNDNS_CRON_ENABLED=false
 
