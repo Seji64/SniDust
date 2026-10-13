@@ -78,8 +78,11 @@
   #services .scroll{max-width:560px;margin:2.2rem auto .35rem}
   .fig{display:block;overflow-x:hidden;margin:0 0 1.1rem}
   .fig svg{width:100%;height:auto}
-  .figm{display:none}
-  .figm svg{width:100%;height:auto}
+  .figsteps{display:none}
+  .flow{list-style-position:outside;font-family:var(--mono);font-size:.86rem;margin:0;padding:0 0 0 1.4rem}
+  .flow li{margin:0 0 7px}
+  .flow li code{display:block}
+  .flow li span{display:block;font-family:var(--sans);font-size:.82rem;color:var(--muted)}
   /* steps */
   .steps{counter-reset:s;list-style:none}
   .steps>li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
@@ -111,8 +114,7 @@
     pre{font-size:.82rem;white-space:pre-wrap;word-break:break-word}
     code{font-size:.88rem}
     .fig{display:none}
-    .figm{display:block;margin:0 0 1.1rem}
-    .figm svg{display:block;margin:0 auto;width:min(100%,420px);height:auto}
+    .figsteps{display:block;margin:0 0 1.1rem}
   }
   @media (max-width:640px){
     .svc{grid-template-columns:1fr 1fr}
@@ -168,63 +170,56 @@
 <section id="how">
   <h2>How it works</h2>
   <div class="fig">
-  <svg viewBox="0 0 760 210" role="img" aria-label="Flow: your device sends DNS queries to the SniDust server, which forwards them to Google and Cloudflare and rewrites the origin IP of blocklisted domains to the server IP.">
+  <svg viewBox="0 0 820 380" role="img" aria-label="Sequence diagram: the client asks the SniDust server for hulu.com; the server answers with its own IP, so the client sends the video request to the server; the server proxies that request to the geo-correct CDN edge and streams the response back to the client.">
     <defs>
-      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#38bdf8"/>
-      </linearGradient>
       <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
         <path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"/>
       </marker>
       <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#2dd4bf"/>
+      </marker>
+      <marker id="arh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
         <path d="M0,0 L10,5 L0,10 z" fill="#f0b42f"/>
       </marker>
     </defs>
-    <g font-family="ui-monospace, Menlo, monospace" font-size="13">
-      <rect x="10" y="70" width="170" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
-      <text x="20" y="94" fill="#cbd6dd" font-weight="600">Your device</text>
-      <text x="20" y="112" fill="#8fa1ad">origin 10.111.123.7</text>
-      <rect x="295" y="55" width="175" height="100" rx="12" fill="#121a22" stroke="#2dd4bf"/>
-      <text x="307" y="79" fill="#2dd4bf" font-weight="700">SniDust</text>
-      <text x="307" y="99" fill="#cbd6dd">dnsdist + nginx</text>
-      <text x="307" y="117" fill="#8fa1ad">server 10.111.123.8</text>
-      <text x="307" y="135" fill="#8fa1ad">ACL: only your IP</text>
-      <rect x="585" y="70" width="165" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
-      <text x="593" y="94" fill="#cbd6dd" font-weight="600">Google · Cloudflare</text>
-      <text x="593" y="112" fill="#8fa1ad">DoH / DoT resolvers</text>
-      <path d="M186 100 C 215 100, 258 100, 289 100" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar)"/>
-      <path d="M476 100 C 505 100, 548 100, 579 100" fill="none" stroke="url(#g1)" stroke-width="1.8" marker-end="url(#ar)"/>
-      <text x="237" y="88" font-size="11" text-anchor="middle" fill="#8fa1ad">DNS / DoH / DoT</text>
-      <text x="527" y="88" font-size="11" text-anchor="middle" fill="#2dd4bf">SpoofAction()</text>
-      <path d="M382 155 C 382 192, 560 192, 667 145" fill="none" stroke="#f0b42f" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#arw)"/>
-      <text x="520" y="203" font-size="11" text-anchor="middle" fill="#f0b42f">blocklisted domain → server IP</text>
+    <g font-family="ui-monospace, Menlo, monospace" font-size="12">
+      <rect x="30" y="10" width="180" height="52" rx="10" fill="#121a22" stroke="#1e2a33"/>
+      <text x="44" y="32" fill="#cbd6dd" font-weight="600">Client device</text>
+      <text x="44" y="50" fill="#8fa1ad">10.111.123.7</text>
+      <rect x="310" y="10" width="190" height="70" rx="12" fill="#121a22" stroke="#2dd4bf"/>
+      <text x="324" y="32" fill="#2dd4bf" font-weight="700">SniDust server</text>
+      <text x="324" y="50" fill="#cbd6dd">10.111.123.8</text>
+      <text x="324" y="68" fill="#8fa1ad">↑ Google · Cloudflare</text>
+      <rect x="590" y="10" width="200" height="52" rx="10" fill="#121a22" stroke="#1e2a33"/>
+      <text x="604" y="32" fill="#cbd6dd" font-weight="600">CDN edge</text>
+      <text x="604" y="50" fill="#8fa1ad">104.98.130.197</text>
+      <path d="M120 78 L120 352" fill="none" stroke="#1e2a33" stroke-dasharray="3 4"/>
+      <path d="M400 88 L400 352" fill="none" stroke="#1e2a33" stroke-dasharray="3 4"/>
+      <path d="M690 78 L690 352" fill="none" stroke="#1e2a33" stroke-dasharray="3 4"/>
+      <path d="M124 106 L396 106" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <text x="260" y="96" font-size="11" text-anchor="middle" fill="#8fa1ad">1  DNS question: hulu.com</text>
+      <path d="M396 142 L124 142" fill="none" stroke="#2dd4bf" stroke-width="1.8" marker-end="url(#arw)"/>
+      <text x="260" y="132" font-size="11" text-anchor="middle" fill="#2dd4bf">2  answer: hulu.com ⇒ 10.111.123.8</text>
+      <path d="M124 182 L396 182" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <text x="260" y="172" font-size="11" text-anchor="middle" fill="#8fa1ad">3  HTTPS request to hulu.com</text>
+      <path d="M404 222 L686 222" fill="none" stroke="#f0b42f" stroke-width="1.6" marker-end="url(#arh)"/>
+      <text x="545" y="212" font-size="11" text-anchor="middle" fill="#f0b42f">4  proxied on to the edge IP</text>
+      <path d="M686 262 L404 262" fill="none" stroke="#f0b42f" stroke-width="1.6" marker-end="url(#arh)"/>
+      <text x="545" y="252" font-size="11" text-anchor="middle" fill="#f0b42f">5  video stream back</text>
+      <path d="M396 302 L124 302" fill="none" stroke="#2dd4bf" stroke-width="1.8" marker-end="url(#arw)"/>
+      <text x="260" y="292" font-size="11" text-anchor="middle" fill="#2dd4bf">6  stream on to the client</text>
     </g>
   </svg>
   </div>
-  <div class="figm">
-  <svg viewBox="0 0 340 312" role="img" aria-label="Vertical flow for small screens: your device sends DNS queries to the SniDust server, which forwards them to the Google and Cloudflare resolvers and spoofs the origin IP.">
-    <defs>
-      <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"/></marker>
-      <marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2dd4bf"/></marker>
-    </defs>
-    <g font-family="ui-monospace, Menlo, monospace" font-size="13">
-      <rect x="20" y="8" width="300" height="56" rx="10" fill="#121a22" stroke="#1e2a33"/>
-      <text x="34" y="30" fill="#cbd6dd" font-weight="600">Your device</text>
-      <text x="34" y="48" fill="#8fa1ad">origin 10.111.123.7</text>
-      <path d="M170 68 L170 104" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar2)"/>
-      <text x="182" y="90" fill="#8fa1ad">DNS / DoH / DoT</text>
-      <rect x="10" y="110" width="320" height="92" rx="12" fill="#121a22" stroke="#2dd4bf"/>
-      <text x="24" y="132" fill="#2dd4bf" font-weight="700">SniDust</text>
-      <text x="24" y="150" fill="#cbd6dd">dnsdist + nginx</text>
-      <text x="24" y="168" fill="#8fa1ad">server 10.111.123.8</text>
-      <text x="24" y="186" fill="#8fa1ad">ACL: only your IP</text>
-      <path d="M170 206 L170 242" fill="none" stroke="#2dd4bf" stroke-width="1.8" marker-end="url(#ar3)"/>
-      <text x="182" y="228" fill="#2dd4bf">SpoofAction()</text>
-      <rect x="20" y="248" width="300" height="56" rx="10" fill="#121a22" stroke="#1e2a33"/>
-      <text x="34" y="270" fill="#cbd6dd" font-weight="600">Google · Cloudflare</text>
-      <text x="34" y="288" fill="#8fa1ad">DoH / DoT resolvers</text>
-    </g>
-  </svg>
+  <div class="figsteps">
+  <ol class="flow">
+    <li><code>10.111.123.7 → 10.111.123.8</code><span>DNS question for hulu.com</span></li>
+    <li><code>10.111.123.8 → 10.111.123.7</code><span>answer: hulu.com ⇒ 10.111.123.8</span></li>
+    <li><code>10.111.123.7 → 10.111.123.8</code><span>HTTPS request to hulu.com</span></li>
+    <li><code>10.111.123.8 → 104.98.130.197</code><span>proxied request to the CDN edge</span></li>
+    <li><code>104.98.130.197 → 10.111.123.8</code><span>video stream back</span></li>
+    <li><code>10.111.123.8 → 10.111.123.7</code><span>stream on to the client</span></li>
+  </ol>
   </div>
 
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
@@ -233,9 +228,12 @@
       <code>/etc/dnsdist/allowedClients.acl</code>; a cron re-resolves DynDNS names every 15 min.</p></div>
     <div class="card"><h4>2 · Blocklist match</h4><p>Queries whose suffix matches one of the 11 lists in
       <code>/etc/snidust/domains.d</code> (55 entries) are tagged; everything else is passed through untouched.</p></div>
-    <div class="card"><h4>3 · Origin rewrite</h4><p>Tagged queries are answered by
-      <code>SpoofAction(EXTERNAL_IP)</code>: the resolver is told the query came from the server, so the service
-      serves its ungeo-restricted answer set.</p></div>
+    <div class="card"><h4>3 · Spoofed answer</h4><p>Tagged queries never reach the real CDN.
+      <code>SpoofAction(EXTERNAL_IP)</code> rewrites the record itself, so the client is told that
+      <code>hulu.com</code> resolves to the server — and opens its video connection there.</p></div>
+    <div class="card"><h4>4 · Reverse proxy</h4><p>nginx proxies that connection to the real host
+      (<code>proxy_pass http://$host$request_uri</code>), resolving the name from the server's own
+      view — the geo-correct CDN edge. The stream is piped back to the client.</p></div>
   </div>
 </section>
 
