@@ -81,7 +81,7 @@ RUN chown -R snidust:snidust /etc/dnsdist/ && \
     chown -R snidust:snidust /run/nginx/ && \
     chmod +x /entrypoint.sh && \
     chmod +x /generateACL.sh && \
-    chmod +x dynDNSCron.sh
+    chmod +x /dynDNSCron.sh
 
 USER snidust
 
