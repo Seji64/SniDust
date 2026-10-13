@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SniDust — SmartDNS proxy to hide your geo-location</title>
+<meta name="description" content="SniDust proxies DNS over UDP, DoH and DoT with DnsDist and Nginx and spoofs your origin IP, so geo-restricted services like Zattoo, Netflix or SRF think you are on the server.">
+<meta name="theme-color" content="#0b0f14">
+<link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
+<link rel="canonical" href="https://seji64.github.io/SniDust/">
+<meta property="og:title" content="SniDust — SmartDNS proxy to hide your geo-location">
+<meta property="og:description" content="DnsDist + Nginx reverse proxy that spoofs the client origin IP for a domain blocklist to bypass geo-restrictions.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://seji64.github.io/SniDust/">
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121a22; --panel2:#0e141b; --line:#1e2a33;
+    --ink:#cbd6dd; --muted:#8fa1ad; --dim:#657684;
+    --a1:#2dd4bf; --a2:#38bdf8; --warn:#f0b42f; --bad:#f76d6d;
+    --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Monaco,"Cascadia Mono","Roboto Mono",monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{font-size:16px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+    -webkit-font-smoothing:antialiased}
+  body{background-image:
+    radial-gradient(1100px 520px at 78% -12%, rgba(45,212,191,.10), transparent 60%),
+    radial-gradient(900px 460px at 8% 108%, rgba(56,189,248,.08), transparent 60%),
+    linear-gradient(0deg, var(--bg), var(--bg))}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 72px}
+  a{color:var(--a2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{font-family:var(--mono);font-size:.9em;background:rgba(255,255,255,.06);padding:.15em .4em;border-radius:4px}
+  kbd{font-family:var(--mono)}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+     font-family:var(--mono);font-size:.86rem;line-height:1.55;overflow-x:auto;color:#d7e3ea}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;margin:.2em 0 .3em}
+  h2{font-size:1.4rem;font-weight:650;margin:1.6em 0 .5em;letter-spacing:-.01em}
+  h3{font-size:1.05rem;font-weight:650;margin:1.3em 0 .4em;color:var(--ink)}
+  p{margin:.6em 0}
+  .muted{color:var(--muted)}
+  .dim{color:var(--dim)}
+  /* top nav */
+  nav{position:sticky;top:0;z-index:9;background:rgba(11,15,20,.86);border-bottom:1px solid var(--line);
+     backdrop-filter:blur(8px)}
+  nav .in{max-width:1080px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:20px}
+  nav .brand{font-family:var(--mono);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.82rem}
+  nav .brand b{color:var(--a1)}
+  nav .links{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.82rem;color:var(--muted)}
+  /* hero */
+  .hero{padding:56px 0 8px}
+  .kicker{font-family:var(--mono);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--a1)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.82rem;
+    padding:9px 15px;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:26px 0 0}
+  .btn a{text-decoration:none}
+  .btn a:hover{background:#17222b}
+  .btns{display:flex;gap:12px;flex-wrap:wrap}
+  .btns .btn{margin:0}
+  .btns{margin:26px 0 0}
+  /* cards */
+  .grid{display:grid;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h4{margin:.2em 0 .3em;font-size:1rem;font-weight:650}
+  .card p{margin:.35em 0;font-size:.9rem}
+  .svc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .svc .card{padding:10px 14px}
+  .svc .card h4{font-size:.92rem}
+  .svc .card p{font-size:.8rem;color:var(--muted)}
+  /* tables */
+  .tbl{width:100%;border-collapse:collapse;font-size:.86rem}
+  .tbl th{background:var(--panel);border:1px solid var(--line);text-align:left;font-weight:650;padding:8px 11px}
+  .tbl td{border:1px solid var(--line);padding:7px 11px;vertical-align:middle}
+  .tbl code{font-size:.82rem}
+  .tbl tr td+td{color:var(--muted)}
+  .tbl tr td code{color:var(--a2)}
+  .scroll{display:block;overflow-x:auto}
+  /* steps */
+  .steps{counter-reset:s;list-style:none}
+  .steps>li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:14px 18px;margin:0 0 10px}
+  .steps>li:before{content:counter(s) "  " attr(data-t);font-family:var(--mono);color:var(--a1);font-weight:700}
+  .steps>li{padding:14px 18px}
+  .steps>li .t{display:block;font-weight:650;margin:0 0 .2em}
+  /* callouts */
+  .note{border-left:3px solid var(--a1);background:rgba(45,212,191,.07);padding:12px 16px;border-radius:0 10px 10px 0}
+  .warn{border-left:3px solid var(--warn);background:rgba(240,180,47,.08);padding:12px 16px;border-radius:0 10px 10px 0}
+  .note p,.warn p{font-size:.9rem}
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:26px 0 0;margin-top:8px}
+  footer .in{max-width:1080px;margin:0 auto;padding:0 24px}
+  footer p{font-size:.82rem;color:var(--dim)}
+  .pill{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  @media (max-width:760px){.svc{grid-template-columns:1fr 1fr}.hero{padding:34px 0 4px}nav .links{font-size:.76rem}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media print{body{background:#fff;color:#111}.wrap{max-width:100%}}
+</style>
+</head>
+<body>
+
+<nav><div class="in">
+  <div class="brand">Sni<b>Dust</b></div>
+  <div class="links">
+    <a href="#how">How it works</a>
+    <a href="#quickstart">Quick start</a>
+    <a href="#config">Configuration</a>
+    <a href="#advanced">Advanced</a>
+    <a href="#trouble">Troubleshooting</a>
+    <a href="https://github.com/Seji64/SniDust">GitHub</a>
+  </div>
+</div></nav>
+
+<div class="wrap">
+
+<section class="hero">
+  <p class="kicker">DnsDist · Nginx · DoH · DoT · UDP</p>
+  <h1>SmartDNS proxy to hide your geo-location</h1>
+  <p class="muted">SniDust proxies your DNS requests and <strong>spoofs your origin IP</strong>, so geo-restricted
+  services (Zattoo, Netflix, SRF.ch, Yallo, Hulu, Amazon Prime, …) see the IP of your server instead of yours.</p>
+  <div class="btns">
+    <a class="btn" href="#quickstart">▸ Quick start</a>
+    <a class="btn" href="https://github.com/Seji64/SniDust">★ GitHub</a>
+    <a class="btn" href="https://ghcr.io/seji64/snidust">ghcr.io/seji64/snidust</a>
+  </div>
+</section>
+
+<section id="how">
+  <h2>How it works</h2>
+  <svg viewBox="0 0 760 210" role="img" aria-label="Flow: your device sends DNS queries to the SniDust server, which forwards them to Google and Cloudflare and rewrites the origin IP of blocklisted domains to the server IP." style="width:100%;height:auto">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#38bdf8"/>
+      </linearGradient>
+      <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"/>
+      </marker>
+    </defs>
+    <g font-family="ui-monospace, Menlo, monospace" font-size="13">
+      <rect x="18" y="70" width="190" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
+      <text x="32" y="94" fill="#cbd6dd" font-weight="600">Your device</text>
+      <text x="32" y="112" fill="#8fa1ad">origin 10.111.123.7</text>
+      <rect x="285" y="55" width="190" height="100" rx="12" fill="#121a22" stroke="#2dd4bf"/>
+      <text x="300" y="79" fill="#2dd4bf" font-weight="700">SniDust</text>
+      <text x="300" y="99" fill="#cbd6dd">dnsdist + nginx</text>
+      <text x="300" y="117" fill="#8fa1ad">server 10.111.123.8</text>
+      <text x="300" y="135" fill="#8fa1ad">ACL: only your IP</text>
+      <rect x="552" y="70" width="190" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
+      <text x="566" y="94" fill="#cbd6dd" font-weight="600">Google · Cloudflare</text>
+      <text x="566" y="112" fill="#8fa1ad">DoH / DoT resolvers</text>
+      <path d="M212 100 C 245 100, 258 100, 281 100" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <path d="M481 100 C 512 100, 524 100, 548 100" fill="none" stroke="url(#g1)" stroke-width="1.8" marker-end="url(#ar)"/>
+      <text x="222" y="88" fill="#8fa1ad">DNS / DoH / DoT</text>
+      <text x="492" y="88" fill="#2dd4bf">SpoofAction()</text>
+      <path d="M380 175 C 380 200, 470 200, 548 145" fill="none" stroke="#f0b42f" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ar)"/>
+      <text x="392" y="196" fill="#f0b42f">blocklisted domain → server IP</text>
+    </g>
+  </svg>
+
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+    <div class="card"><h4>1 · Access control</h4><p>Only clients on the ACL may use the proxy. IPs and DynDNS
+      domains from <code>ALLOWED_CLIENTS</code> are resolved to IPs and written to
+      <code>/etc/dnsdist/allowedClients.acl</code>; a cron re-resolves DynDNS names every 15 min.</p></div>
+    <div class="card"><h4>2 · Blocklist match</h4><p>Queries whose suffix matches one of the 11 lists in
+      <code>/etc/snidust/domains.d</code> (55 entries) are tagged; everything else is passed through untouched.</p></div>
+    <div class="card"><h4>3 · Origin rewrite</h4><p>Tagged queries are answered by
+      <code>SpoofAction(EXTERNAL_IP)</code>: the resolver is told the query came from the server, so the service
+      serves its ungeo-restricted answer set.</p></div>
+  </div>
+</section>
+
+<section id="services">
+  <h2>Supported services</h2>
+  <p class="muted">Optimised for these services; the shipped lists cover their CDN and API domains.</p>
+  <div class="svc">
+    <div class="card"><h4>Zattoo</h4><p>ch + wemfbox + akamai variants</p></div>
+    <div class="card"><h4>Netflix</h4><p>nflx* + netflix.de</p></div>
+    <div class="card"><h4>SRF / RTS</h4><p>srgssr.ch, cdn.rts.ch</p></div>
+    <div class="card"><h4>Yallo</h4><p>yallo.tv, zahs.tv</p></div>
+    <div class="card"><h4>Hulu</h4><p>hulu.com, huluim.com</p></div>
+    <div class="card"><h4>Amazon Prime</h4><p>amazonvideo.com, amazon.co.uk</p></div>
+    <div class="card"><h4>HBO</h4><p>hbogo.com, hbonow.com</p></div>
+    <div class="card"><h4>Molotov TV</h4><p>molotov.tv, y3o.tv</p></div>
+    <div class="card"><h4>YouTube</h4><p>youtubei, googlevideo, youtu.be</p></div>
+    <div class="card"><h4>Akamai CDN</h4><p>10 akamai domains</p></div>
+  </div>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Blocklist file</th><th>Entries</th><th>Blocklist file</th><th>Entries</th></tr></thead>
+    <tbody>
+      <tr><td><code>01-cdn_akamai.lst</code></td><td>11</td><td><code>05-netflix.lst</code></td><td>11</td></tr>
+      <tr><td><code>07-srf_ch.lst</code></td><td>4</td><td><code>02-amazon.lst</code></td><td>3</td></tr>
+      <tr><td><code>09-zattoo.lst</code></td><td>9</td><td><code>03-hbo.lst</code></td><td>3</td></tr>
+      <tr><td><code>11-youtube.lst</code></td><td>7</td><td><code>04-hulu.lst</code></td><td>2</td></tr>
+      <tr><td><code>06-molotov_tv.lst</code></td><td>2</td><td><code>10-yallo.lst</code></td><td>2</td></tr>
+      <tr><td><code>00-debug.lst</code></td><td>1</td><td><strong>Total</strong></td><td><strong>55</strong></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="quickstart">
+  <h2>Quick start</h2>
+  <div class="steps">
+    <li><span class="t">Find your client IP</span><pre>curl https://ifconfig.co</pre>
+      <p class="muted">Run this on the device that will use the proxy. DynDNS domains work as well.</p></li>
+    <li><span class="t">Find your server IP</span><pre>curl https://ifconfig.co</pre>
+      <p class="muted">Run this on the VPS that hosts SniDust. This is the IP that gets spoofed.</p></li>
+    <li><span class="t">Start the image</span><pre>docker run -d \
+  --name snidust \
+  -e ALLOWED_CLIENTS="127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com" \
+  -e EXTERNAL_IP=10.111.123.8 \
+  -p 443:8443 -p 80:8080 -p 53:5300/udp \
+  ghcr.io/seji64/snidust:latest</pre>
+      <p class="muted">Prebuilt for <code>linux/amd64</code>, <code>linux/arm64</code> and <code>linux/arm/v7</code> — no local build needed.</p></li>
+    <li><span class="t">Check the log</span><pre>docker logs snidust</pre>
+      <p class="muted">You should see the upstreams (dns.google, cloudflare-dns) marked <em>up</em> and the ACL loaded.</p></li>
+    <li><span class="t">Point your device at the server</span><pre>sudo resolvctl set nameservers 10.111.123.8   # macOS
+# or set DoH/DoT manually: https://10.111.123.8/dns-query</pre>
+      <p class="muted">Set the DNS server of the device (or the whole network) to the public IP of your server. Geo-location hidden.</p></li>
+  </div>
+
+  <h3>Docker Compose</h3>
+  <pre>version: '3.3'
+services:
+    snidust:
+        container_name: snidust
+        image: 'ghcr.io/seji64/snidust:latest'
+        environment:
+            - TZ=Europe/Berlin
+            - 'ALLOWED_CLIENTS=127.0.0.1, 10.111.123.7, myDynDNSDomain.no-ip.com'
+            - 'EXTERNAL_IP=10.111.123.8'
+            - SPOOF_ALL_DOMAINS=false
+            # - 'DYNDNS_CRON_SCHEDULE=*/1 * * * *'
+        ports:
+            - 443:8443
+            - 80:8080
+            - 53:5300/udp</pre>
+</section>
+
+<section id="ports">
+  <h2>Ports</h2>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Port</th><th>Protocol</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>5300/udp</code></td><td>DNS</td><td>Classic DNS endpoint — map to <code>53:5300/udp</code>.</td></tr>
+      <tr><td><code>8080/tcp</code></td><td>DoH (plain)</td><td>Nginx reverse proxy for DNS-over-HTTPS, map to <code>80:8080</code>.</td></tr>
+      <tr><td><code>8443/tcp</code></td><td>DoH / DoT (TLS)</td><td>Nginx stream module with <code>ssl_preread</code>, map to <code>443:8443</code>.</td></tr>
+      <tr><td><code>8530/tcp</code></td><td>DoH / DoT (TLS)</td><td>Native dnsdist TLS endpoint, only with <code>DNSDIST_ENABLE_DOT=true</code>.</td></tr>
+      <tr><td><code>8083/tcp</code></td><td>HTTP</td><td>dnsdist web interface, bound to <code>127.0.0.1</code>; needs <code>DNSDIST_ENABLE_WEBSERVER=true</code> and <code>-p 8083:8083</code>.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="config">
+  <h2>Configuration</h2>
+  <h3>Core settings</h3>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>ALLOWED_CLIENTS</code></td><td><code>127.0.0.1</code></td><td>Comma-separated IPs or DynDNS domains allowed to use the proxy.</td></tr>
+      <tr><td><code>ALLOWED_CLIENTS_FILE</code></td><td><em>(empty)</em></td><td>Path to an ACL file; allows reloading without a restart.</td></tr>
+      <tr><td><code>EXTERNAL_IP</code></td><td><em>(empty)</em></td><td>Public server IP used for spoofing.</td></tr>
+      <tr><td><code>SPOOF_ALL_DOMAINS</code></td><td><code>false</code></td><td>Spoof every query, regardless of the blocklists (not recommended).</td></tr>
+      <tr><td><code>INSTALL_DEFAULT_DOMAINS</code></td><td><code>true</code></td><td>Install the domain lists shipped in the repo.</td></tr>
+      <tr><td><code>DYNDNS_CRON_SCHEDULE</code></td><td><code>*/15 * * * *</code></td><td>Cron schedule for re-resolving DynDNS domains.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>DnsDist performance &amp; security</h3>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>DNSDIST_RATE_LIMIT_DISABLE</code></td><td><code>false</code></td><td>Disable rate limiting entirely.</td></tr>
+      <tr><td><code>DNSDIST_RATE_LIMIT_WARN</code></td><td><code>800</code></td><td>Warn above this many queries per second.</td></tr>
+      <tr><td><code>DNSDIST_RATE_LIMIT_BLOCK</code></td><td><code>1000</code></td><td>Block above this many queries per second.</td></tr>
+      <tr><td><code>DNSDIST_RATE_LIMIT_BLOCK_DURATION</code></td><td><code>360</code></td><td>Seconds a client stays blocked.</td></tr>
+      <tr><td><code>DNSDIST_RATE_LIMIT_EVAL_WINDOW</code></td><td><code>60</code></td><td>Evaluation window in seconds.</td></tr>
+      <tr><td><code>DNSDIST_PACKAGE_CACHE_ENABLED</code></td><td><code>false</code></td><td>Enable packet cache to cut latency.</td></tr>
+      <tr><td><code>DNSDIST_PACKAGE_CACHE_SIZE</code></td><td><code>50000</code></td><td>Maximum entries in the packet cache.</td></tr>
+      <tr><td><code>DNSDIST_UPSTREAM_POOL_NAME</code></td><td><code>upstream</code></td><td>Pool name; change when using custom upstreams.</td></tr>
+      <tr><td><code>DNSDIST_UPSTREAM_CHECK_INTERVAL</code></td><td><code>10</code></td><td>Seconds between upstream health checks.</td></tr>
+      <tr><td><code>DNSDIST_ENABLE_DOT</code></td><td><code>false</code></td><td>Enable native DoT/DoH on port 8530.</td></tr>
+      <tr><td><code>DNSDIST_DOT_CERT_TYPE</code></td><td><code>self-signed</code></td><td>Certificate type for DoT (<code>self-signed</code> / ACME).</td></tr>
+      <tr><td><code>DNSDIST_ENABLE_WEBSERVER</code></td><td><code>false</code></td><td>Enable the dnsdist web UI on <code>127.0.0.1:8083</code>.</td></tr>
+      <tr><td><code>DNSDIST_DEBUG</code></td><td><code>false</code></td><td>Log every query to <code>/tmp/dnsdist.log</code>.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="advanced">
+  <h2>Advanced setups</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    <div class="card"><h4>DNS over TLS (DoT)</h4><p>See <code>docker-compose.dot.yml</code> and
+      <code>docker-compose.acme.sh-dot.yml</code> in the repo for a self-signed or an ACME (real certificate) setup.</p></div>
+    <div class="card"><h4>Custom upstreams</h4><p>Create <code>99-customUpstream.conf</code> with
+      <code>newServer({address="…", pool="customUpstream"})</code>, mount it into
+      <code>/etc/dnsdist/conf.d/</code> and set <code>DNSDIST_UPSTREAM_POOL_NAME=customUpstream</code>.</p></div>
+    <div class="card"><h4>Custom domain lists</h4><p>Add <code>99-custom.lst</code> and mount it into
+      <code>/etc/snidust/domains.d/99-custom.lst:ro</code> — one domain per line.</p></div>
+    <div class="card"><h4>Custom nginx config</h4><p>Mount your own file at <code>/etc/nginx/nginx.conf:ro</code>
+      for reverse-proxy or performance tuning.</p></div>
+  </div>
+
+  <h3>Reload without restarting</h3>
+  <p class="muted">SniDust answers specific magic queries and re-reads its configuration in place — no restart, no downtime.</p>
+  <pre>dig @10.111.123.8 reload.acl.snidust.local         # re-read the ACL
+dig @10.111.123.8 reload.domainlist.snidust.local  # re-read the blocklists
+dig @10.111.123.8 reload.certs.snidust.local       # re-read the DoT certificates</pre>
+</section>
+
+<section id="trouble">
+  <h2>Troubleshooting</h2>
+  <div class="warn"><p><strong>Port 53 already in use.</strong> On Linux, <code>systemd-resolved</code> (or Pi-hole)
+  usually occupies port 53. Free it before mapping <code>53:5300/udp</code> — see the guide linked from the README.</p></div>
+  <div class="note"><p><strong>Nothing is spoofed?</strong> Check the domain is really covered by a list
+  (<code>docker exec snidust cat /etc/snidust/domains.d/*.lst</code>), that your client IP is in the ACL
+  (<code>docker exec snidust cat /etc/dnsdist/allowedClients.acl</code>), and set <code>DNSDIST_DEBUG=true</code>
+  to watch queries in <code>/tmp/dnsdist.log</code>.</p></div>
+  <p class="muted">Requirements: a VPS or root server with Docker, a public IP that is not itself geo-blocked,
+  and a client whose DNS you can change. The image is Alpine-based, runs as <code>snidust</code> and is supervised by <code>tini</code>.</p>
+</section>
+
+<section id="credits">
+  <h2>Credits</h2>
+  <p class="muted">Built on <a href="https://dnsdist.org/">dnsdist.org</a>, <a href="https://www.nginx.com">nginx.org</a>,
+  <a href="https://github.com/andykimpe/wilmaa-proxy">wilmaa-proxy</a>,
+  <a href="https://github.com/suuhm/unblock-proxy.sh">unblock-proxy.sh</a> and
+  <a href="https://github.com/ab77/netflix-proxy">netflix-proxy</a>.</p>
+  <p class="pill">Source: <a href="https://github.com/Seji64/SniDust">github.com/Seji64/SniDust</a> ·
+  Image: <a href="https://ghcr.io/seji64/snidust">ghcr.io/seji64/snidust:latest</a></p>
+</section>
+
+</div>
+
+<footer><div class="in">
+  <p>SniDust · GitHub Pages · static HTML, no build step, no JavaScript, no external assets.</p>
+</div></footer>
+
+</body>
+</html>

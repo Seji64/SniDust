@@ -1,4 +1,5 @@
 [![Docker](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml)
+[![Website](https://img.shields.io/badge/Website-seji64.github.io-2dd4bf?style=flat&logo=githubpages&logoColor=white)](https://seji64.github.io/SniDust/)
 
 # SniDust
 **SmartDNS Proxy to hide your GeoLocation.** 
