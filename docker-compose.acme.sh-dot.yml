@@ -43,5 +43,5 @@ services:
             - '53:5300/udp'
             - '53:5300/tcp'
             - '853:8530/tcp'
-        image: 'ghcr.io/seji64/snidust:main'
+        image: 'ghcr.io/seji64/snidust:latest'
         restart: unless-stopped
