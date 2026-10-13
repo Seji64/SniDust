@@ -134,25 +134,28 @@
       <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
         <path d="M0,0 L10,5 L0,10 z" fill="#38bdf8"/>
       </marker>
+      <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#f0b42f"/>
+      </marker>
     </defs>
     <g font-family="ui-monospace, Menlo, monospace" font-size="13">
-      <rect x="18" y="70" width="190" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
-      <text x="32" y="94" fill="#cbd6dd" font-weight="600">Your device</text>
-      <text x="32" y="112" fill="#8fa1ad">origin 10.111.123.7</text>
-      <rect x="285" y="55" width="190" height="100" rx="12" fill="#121a22" stroke="#2dd4bf"/>
-      <text x="300" y="79" fill="#2dd4bf" font-weight="700">SniDust</text>
-      <text x="300" y="99" fill="#cbd6dd">dnsdist + nginx</text>
-      <text x="300" y="117" fill="#8fa1ad">server 10.111.123.8</text>
-      <text x="300" y="135" fill="#8fa1ad">ACL: only your IP</text>
-      <rect x="552" y="70" width="190" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
-      <text x="566" y="94" fill="#cbd6dd" font-weight="600">Google · Cloudflare</text>
-      <text x="566" y="112" fill="#8fa1ad">DoH / DoT resolvers</text>
-      <path d="M212 100 C 245 100, 258 100, 281 100" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar)"/>
-      <path d="M481 100 C 512 100, 524 100, 548 100" fill="none" stroke="url(#g1)" stroke-width="1.8" marker-end="url(#ar)"/>
-      <text x="222" y="88" fill="#8fa1ad">DNS / DoH / DoT</text>
-      <text x="492" y="88" fill="#2dd4bf">SpoofAction()</text>
-      <path d="M380 175 C 380 200, 470 200, 548 145" fill="none" stroke="#f0b42f" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ar)"/>
-      <text x="392" y="196" fill="#f0b42f">blocklisted domain → server IP</text>
+      <rect x="10" y="70" width="170" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
+      <text x="20" y="94" fill="#cbd6dd" font-weight="600">Your device</text>
+      <text x="20" y="112" fill="#8fa1ad">origin 10.111.123.7</text>
+      <rect x="295" y="55" width="175" height="100" rx="12" fill="#121a22" stroke="#2dd4bf"/>
+      <text x="307" y="79" fill="#2dd4bf" font-weight="700">SniDust</text>
+      <text x="307" y="99" fill="#cbd6dd">dnsdist + nginx</text>
+      <text x="307" y="117" fill="#8fa1ad">server 10.111.123.8</text>
+      <text x="307" y="135" fill="#8fa1ad">ACL: only your IP</text>
+      <rect x="585" y="70" width="165" height="70" rx="10" fill="#121a22" stroke="#1e2a33"/>
+      <text x="593" y="94" fill="#cbd6dd" font-weight="600">Google · Cloudflare</text>
+      <text x="593" y="112" fill="#8fa1ad">DoH / DoT resolvers</text>
+      <path d="M186 100 C 215 100, 258 100, 289 100" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ar)"/>
+      <path d="M476 100 C 505 100, 548 100, 579 100" fill="none" stroke="url(#g1)" stroke-width="1.8" marker-end="url(#ar)"/>
+      <text x="237" y="88" font-size="11" text-anchor="middle" fill="#8fa1ad">DNS / DoH / DoT</text>
+      <text x="527" y="88" font-size="11" text-anchor="middle" fill="#2dd4bf">SpoofAction()</text>
+      <path d="M382 155 C 382 192, 560 192, 667 145" fill="none" stroke="#f0b42f" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#arw)"/>
+      <text x="520" y="203" font-size="11" text-anchor="middle" fill="#f0b42f">blocklisted domain → server IP</text>
     </g>
   </svg>
 
