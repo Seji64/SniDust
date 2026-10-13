@@ -31,7 +31,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px 72px}
   a{color:var(--a2);text-decoration:none}
   a:hover{text-decoration:underline}
-  code{font-family:var(--mono);font-size:.9em;background:rgba(255,255,255,.06);padding:.15em .4em;border-radius:4px}
+  code{font-family:var(--mono);font-size:.9em;background:rgba(255,255,255,.06);padding:.15em .4em;border-radius:4px;overflow-wrap:break-word}
   kbd{font-family:var(--mono)}
   pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
      font-family:var(--mono);font-size:.86rem;line-height:1.55;overflow-x:auto;color:#d7e3ea}
@@ -74,7 +74,10 @@
   .tbl code{font-size:.82rem}
   .tbl tr td+td{color:var(--muted)}
   .tbl tr td code{color:var(--a2)}
-  .scroll{display:block;overflow-x:auto}
+  .scroll{display:block;overflow-x:auto;margin:1.15rem 0 .35rem}
+  #services .scroll{max-width:560px;margin:2.2rem auto .35rem}
+  .fig{display:block;overflow-x:hidden;margin:0 0 1.1rem}
+  .fig svg{width:100%;height:auto}
   /* steps */
   .steps{counter-reset:s;list-style:none}
   .steps>li{counter-increment:s;background:var(--panel);border:1px solid var(--line);
@@ -91,7 +94,41 @@
   footer .in{max-width:1080px;margin:0 auto;padding:0 24px}
   footer p{font-size:.82rem;color:var(--dim)}
   .pill{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
-  @media (max-width:760px){.svc{grid-template-columns:1fr 1fr}.hero{padding:34px 0 4px}nav .links{font-size:.76rem}}
+  @media (max-width:860px){
+    .wrap{padding:0 18px 52px}
+    .hero{padding:34px 0 4px}
+    nav{position:static}
+    nav .in{padding:10px 18px;gap:10px}
+    nav .links{font-size:.86rem;gap:2px 16px}
+    nav .links a{padding:8px 8px;margin:-8px -8px}
+    .btn{font-size:.88rem;padding:12px 17px}
+    .card p{font-size:.92rem}
+    .svc .card p{font-size:.84rem}
+    .tbl{font-size:.9rem}
+    .tbl th,.tbl td{padding:8px 10px}
+    pre{font-size:.82rem;white-space:pre-wrap;word-break:break-word}
+    code{font-size:.88rem}
+    .fig{overflow-x:auto}
+    .fig svg{width:660px;max-width:175vw}
+  }
+  @media (max-width:640px){
+    .svc{grid-template-columns:1fr 1fr}
+    nav .links a:not(:last-child){display:none}
+    nav .links{gap:0 10px}
+    .grid,.svc{gap:10px}
+    .steps>li{padding:12px 14px}
+    .tbl,.tbl thead,.tbl tbody,.tbl tr,.tbl th,.tbl td{display:block;width:100%;border:none}
+    .tbl thead{position:absolute;left:0;top:0;height:1px;overflow:hidden;clip-path:rect(0,0,0,0)}
+    .tbl tr{border:1px solid var(--line);border-radius:10px;padding:10px 13px;margin:0 0 10px}
+    .tbl td{padding:3px 0;color:var(--muted)}
+    .tbl td:first-child{color:var(--ink);font-weight:600}
+    #ports .tbl td:nth-child(2)::before{content:"protocol · "}
+    #ports .tbl td:nth-child(3)::before{content:"purpose · "}
+    #config .tbl td:nth-child(2)::before{content:"default · "}
+    #services .tbl td:nth-child(2)::before{content:"entries · "}
+    .scroll{overflow:visible;margin:1rem 0 .3rem}
+    .fig svg{width:600px;max-width:175vw}
+  }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   @media print{body{background:#fff;color:#111}.wrap{max-width:100%}}
 </style>
@@ -126,7 +163,8 @@
 
 <section id="how">
   <h2>How it works</h2>
-  <svg viewBox="0 0 760 210" role="img" aria-label="Flow: your device sends DNS queries to the SniDust server, which forwards them to Google and Cloudflare and rewrites the origin IP of blocklisted domains to the server IP." style="width:100%;height:auto">
+  <div class="fig">
+  <svg viewBox="0 0 760 210" role="img" aria-label="Flow: your device sends DNS queries to the SniDust server, which forwards them to Google and Cloudflare and rewrites the origin IP of blocklisted domains to the server IP.">
     <defs>
       <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#38bdf8"/>
@@ -158,6 +196,7 @@
       <text x="520" y="203" font-size="11" text-anchor="middle" fill="#f0b42f">blocklisted domain → server IP</text>
     </g>
   </svg>
+  </div>
 
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
     <div class="card"><h4>1 · Access control</h4><p>Only clients on the ACL may use the proxy. IPs and DynDNS
@@ -187,14 +226,20 @@
     <div class="card"><h4>Akamai CDN</h4><p>10 akamai domains</p></div>
   </div>
   <div class="scroll"><table class="tbl">
-    <thead><tr><th>Blocklist file</th><th>Entries</th><th>Blocklist file</th><th>Entries</th></tr></thead>
+    <thead><tr><th>Blocklist file</th><th>Entries</th></tr></thead>
     <tbody>
-      <tr><td><code>01-cdn_akamai.lst</code></td><td>11</td><td><code>05-netflix.lst</code></td><td>11</td></tr>
-      <tr><td><code>07-srf_ch.lst</code></td><td>4</td><td><code>02-amazon.lst</code></td><td>3</td></tr>
-      <tr><td><code>09-zattoo.lst</code></td><td>9</td><td><code>03-hbo.lst</code></td><td>3</td></tr>
-      <tr><td><code>11-youtube.lst</code></td><td>7</td><td><code>04-hulu.lst</code></td><td>2</td></tr>
-      <tr><td><code>06-molotov_tv.lst</code></td><td>2</td><td><code>10-yallo.lst</code></td><td>2</td></tr>
-      <tr><td><code>00-debug.lst</code></td><td>1</td><td><strong>Total</strong></td><td><strong>55</strong></td></tr>
+      <tr><td><code>00-debug.lst</code></td><td>1</td></tr>
+      <tr><td><code>01-cdn_akamai.lst</code></td><td>11</td></tr>
+      <tr><td><code>02-amazon.lst</code></td><td>3</td></tr>
+      <tr><td><code>03-hbo.lst</code></td><td>3</td></tr>
+      <tr><td><code>04-hulu.lst</code></td><td>2</td></tr>
+      <tr><td><code>05-netflix.lst</code></td><td>11</td></tr>
+      <tr><td><code>06-molotov_tv.lst</code></td><td>2</td></tr>
+      <tr><td><code>07-srf_ch.lst</code></td><td>4</td></tr>
+      <tr><td><code>09-zattoo.lst</code></td><td>9</td></tr>
+      <tr><td><code>10-yallo.lst</code></td><td>2</td></tr>
+      <tr><td><code>11-youtube.lst</code></td><td>7</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>55</strong></td></tr>
     </tbody>
   </table></div>
 </section>
